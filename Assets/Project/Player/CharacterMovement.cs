@@ -13,14 +13,21 @@ public class CharacterMovement : MonoBehaviour
     private float rotateSpeed;
     [SerializeField]
     private Camera Cam;
+
+
+    private int t = 100;
+    public float gravity = -10f;
+
+    private CharacterController Body;
     private void Awake()
     {
         _input = GetComponent<Inputs_handle>();
+        Body = GetComponent<CharacterController>();
     }
    
 
     // Update is called once per frame  
-    void Update()
+    void FixedUpdate()
     {
         //CONVERT 2D VECTOR TO 3D ON TWO AXIS
         var targetVec = new Vector3(_input.InputVector.x, 0, _input.InputVector.y);
@@ -35,11 +42,18 @@ public class CharacterMovement : MonoBehaviour
 
         Vector3 CamPos = Cam.transform.position;
 
-        CamPos.x = transform.position.x - 100;
+        CamPos.x = transform.position.x - t;
         CamPos.y = transform.position.y + 140;
         CamPos.z = transform.position.z - 90;
-        Cam.transform.position = CamPos;
+        
 
+        if (Input.GetMouseButton(0))
+        {
+            Vector3 dir = Cam.ScreenToViewportPoint(Input.mousePosition);
+            
+        }
+
+        Cam.transform.position = CamPos;
     }
 
     private void rotatetoMovementVector(Vector3 MovementVec)
@@ -70,7 +84,12 @@ public class CharacterMovement : MonoBehaviour
         targetVec = Quaternion.Euler(0, Cam.gameObject.transform.eulerAngles.y, 0) * targetVec;
 
         var targetPos = transform.position + targetVec * moveSpeed;
-        transform.position = targetPos;
+        // transform.position = targetPos;
+        //Body.transform.position = targetPos;
+        // Body.MovePosition(targetPos);
+        targetVec.y -= 5;
+        Body.Move(targetVec);
+        //Body.AddForce(targetPos);
         return targetVec;
     }
 }

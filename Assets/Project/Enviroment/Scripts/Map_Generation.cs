@@ -356,7 +356,7 @@ public class Map_Generation : MonoBehaviour
                         finalHeight = 0.15f;
                         average = finalHeight;
                         i = 20;
-                        Debug.Log(average);
+                        //Debug.Log(average);
                     }
 
                     else if (average < finalHeight && average > (finalHeight - 0.1))
@@ -370,7 +370,7 @@ public class Map_Generation : MonoBehaviour
                 if (l < 10)
                 {
                     //Debug.Log(Check);
-                    Debug.Log(average);
+                   // Debug.Log(average);
                     l++;
                 }
                 //}
@@ -387,7 +387,7 @@ public class Map_Generation : MonoBehaviour
                     if (average > 0.41)
                     {
                         Map_Colour[y * Width + x] = Biomes[2].colour;
-                        Debug.Log(average);
+                       // Debug.Log(average);
                     }
                 }
 
