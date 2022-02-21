@@ -1,0 +1,76 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CharacterMovement : MonoBehaviour
+{
+    private Inputs_handle _input;
+
+    [SerializeField]
+    private float moveSpeed;
+    [SerializeField]
+    private float rotateSpeed;
+    [SerializeField]
+    private Camera Cam;
+    private void Awake()
+    {
+        _input = GetComponent<Inputs_handle>();
+    }
+   
+
+    // Update is called once per frame  
+    void Update()
+    {
+        //CONVERT 2D VECTOR TO 3D ON TWO AXIS
+        var targetVec = new Vector3(_input.InputVector.x, 0, _input.InputVector.y);
+
+        //MOVE DIRECTION AIMING
+
+
+        var MovementVec = moveToTarget(targetVec);
+        //rotate direction traveling
+
+        rotatetoMovementVector(MovementVec);
+
+        Vector3 CamPos = Cam.transform.position;
+
+        CamPos.x = transform.position.x - 100;
+        CamPos.y = transform.position.y + 140;
+        CamPos.z = transform.position.z - 90;
+        Cam.transform.position = CamPos;
+
+    }
+
+    private void rotatetoMovementVector(Vector3 MovementVec)
+    {
+        //keep last rotation unless changed
+        /*
+        if(MovementVec.magnitude == 0) { return; }
+        var rotation = Quaternion.LookRotation(MovementVec);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, rotateSpeed);
+        */
+
+        Ray ray = Cam.ScreenPointToRay(_input.MousePos);
+
+        if (Physics.Raycast(ray, out RaycastHit hitinfo, maxDistance: 500f))
+        {
+            var target = hitinfo.point;
+            target.y = transform.position.y;
+            transform.LookAt(target);
+        }
+
+    }
+
+    private Vector3 moveToTarget(Vector3 targetVec)
+    {
+        var speed = moveSpeed * Time.deltaTime;
+
+        //rotate based on camera
+        targetVec = Quaternion.Euler(0, Cam.gameObject.transform.eulerAngles.y, 0) * targetVec;
+
+        var targetPos = transform.position + targetVec * moveSpeed;
+        transform.position = targetPos;
+        return targetVec;
+    }
+}
