@@ -17,6 +17,15 @@ public class EntityTracker : MonoBehaviour
 
     }
 
+    ///moemnt shjould be handled in entity
+    ///
+    public void move (Alive_entity Entity, )
+    {
+
+
+
+
+    }
 
 
 
