@@ -71,9 +71,12 @@
     <Compile Include="Assets\Project\Enviroment\Scripts\Vegation.cs" />
     <Compile Include="Assets\Project\Behaviours\Scripts\Animal_Spawner.cs" />
     <Compile Include="Assets\Project\Player\Inputs_handle.cs" />
+    <Compile Include="Assets\Project\Enviroment\Scripts\Coords.cs" />
     <Compile Include="Assets\Project\Enviroment\Scripts\Map_Generation.cs" />
     <Compile Include="Assets\Project\Enviroment\Scripts\Erosion.cs" />
     <Compile Include="Assets\Project\Enviroment\References\FastNoise.cs" />
+    <Compile Include="Assets\Project\Behaviours\Scripts\Alive_entity.cs" />
+    <Compile Include="Assets\Project\Behaviours\Scripts\EntityTracker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
