@@ -1,42 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//[System.Serializable]
 
-public struct Coords
+
+public class Coords
 {
     // Start is called before the first frame update
 
     public int x;
     public int y;
-    
 
 
+
+    public int m_gCost; //distance from start
+    public int m_hCost; //distance if not account for  blockers
+    public int m_fCost; //fcost distance to node
+
+
+    public Coords LastCoord;
+    public bool IsWalkable;
+    public bool IsWater;
+    public bool Vegation;
+    public Alive_entity Creature;
     public Coords(int x, int y)
     {
         this.x = x;
         this.y = y;
+        IsWalkable = true;
+        LastCoord = null;
+        
     }
+    
 
-    public float GetDistantance(Coords a, Coords b)
+
+
+    public void CalculateFCost()
     {
-        return (float)System.Math.Sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
-
-    }
-
-    public Vector3 Coordtoworld(Coords Transcoord)
-    {
-
-        Vector3 Trans;
-        Trans.x = Transcoord.x * 10 + 5;
-        Trans.y = Transcoord.y * 10 - 5;
-        Trans.z = 10;
-        return Trans;
+        m_fCost = m_gCost + m_hCost;
     }
 
 
-
-
+    
     //get world coord
 
     //return world coord

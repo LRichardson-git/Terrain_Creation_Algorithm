@@ -24,7 +24,7 @@ public class CharacterMovement : MonoBehaviour
     
     private int t = 100;
     public float gravity = -10f;
-    int f = 1;
+    
     public Coords lol2;
     public Coords lol3;
     private CharacterController Body;
@@ -61,7 +61,7 @@ public class CharacterMovement : MonoBehaviour
         {
             Vector3 dir = Cam.ScreenToViewportPoint(Input.mousePosition);
             
-                Debug.Log(dir);
+              //Debug.Log(dir);
                 
                    
         }

@@ -8,6 +8,9 @@ public enum Species
     fox = 1 
 
 };
+
+
+
 public class Alive_entity : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -15,20 +18,12 @@ public class Alive_entity : MonoBehaviour
 
 
     protected bool dead;
-    public Species Animal;
+    public int Animal;
     public Material material;
-    public Coords coord;
     public int Index;
-
-    public virtual void Initate(Coords coord)
-    {
-        this.coord = coord;
-        transform.position = this.coord.Coordtoworld(this.coord);
-
-
-        //change material
-       
-    }
+    public int HP = 10;
+    public int x;
+    public int y;
 
 
 
