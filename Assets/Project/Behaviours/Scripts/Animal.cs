@@ -50,12 +50,15 @@ public class Animal : Alive_entity
     // Update is called once per frame
     void Update()
     {
-
+        
 
         if (Input.GetKeyDown("up"))
         {
-           // if ( once < 1) { 
-            PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y) ;
+            // if ( once < 1) { 
+            //PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y) ;
+            Coords Temp = EntityTracker.Instance.FindWater(x, y, 10);
+            Debug.Log(Temp.x);
+            Debug.Log(Temp.y);
             //Debug.Log(PathList[0]);
               //  }
         }
@@ -88,12 +91,16 @@ public class Animal : Alive_entity
                // AnimialNum = 4;
 
                 Predators = new List<Alive_entity>(EntityTracker.Instance.CheckPredators(x, y, range, Animal));
-                if (Predators != null)
+                if (Predators.Count != 0)
                 {
                     //run away
                     Debug.Log(Predators[0].x);
+                    Debug.Log(Predators[0].y);
                 }
-
+                else
+                {
+                    Debug.Log("no pred");
+                }
 
             }
 

@@ -66,6 +66,7 @@ public class Map_Generation : MonoBehaviour
     public bool Auto_Update;
     public bool screnshot = false;
     float[,] Map_Noise;
+    float[,] Map_Noise2;
     Color[] Map_Colour;
     float[] bulidingMap;
 
@@ -103,6 +104,9 @@ public class Map_Generation : MonoBehaviour
         Map_Noise = Noise_Maps.GenNoiseMap(Width, Height, Seed, Scale_Noise, Octaves, Amplitude, Frequency, OffSet,
             Perlin_Noise, value_noise, Simplex_noise, type);
 
+
+        Map_Noise2 = Noise_Maps.GenNoiseMap(Width, Height, Seed, Scale_Noise, Octaves, Amplitude, Frequency, OffSet,
+            Perlin_Noise, value_noise, Simplex_noise, type);
         //colouring the map
         Map_Colour = new Color[Width * Height];
 
@@ -126,11 +130,11 @@ public class Map_Generation : MonoBehaviour
             erode();
         }
 
-        ColourMap();
 
+        ColourMap();
         //FindBuildings();
         FindBuildings();
-
+        
         //Create references to scripts that generate buildings, map and vegation
         Display_Map Display = FindObjectOfType<Display_Map>();
         Building_Generator Buildings_gen = FindObjectOfType<Building_Generator>();
@@ -155,6 +159,8 @@ public class Map_Generation : MonoBehaviour
             //Display script activates creation of mesh
             Display.DrawMesh(MapMeshGenertion.GenerateMeshTerrain(Map_Noise, MeshHeight, MeshHeightCurve),
                 Textures.TextureFromMap(Map_Colour, Width, Height));
+
+            
 
             if (Animalss == true)
             {
@@ -320,8 +326,21 @@ public class Map_Generation : MonoBehaviour
     }
 
 
-    //changed to flatten the map
-    void FindBuildings()
+    void Update()
+    {
+       
+
+        if (Input.GetKeyDown("down"))
+        {
+            // if ( once < 1) { 
+            EntityTracker.Instance.Init(Map_Colour, Biomes[1].colour, Width, Map_Noise2);
+            //Debug.Log(PathList[0]);
+            //  }
+        }
+    }
+
+        //changed to flatten the map
+        void FindBuildings()
     {
         bulidingMap = new float[Width * Height];
 
@@ -380,7 +399,7 @@ public class Map_Generation : MonoBehaviour
                 Map_Noise[x + 1, y] = average;
                 Map_Noise[x, y + 1] = average;
 
-
+                /*
                 if (Map_Colour[y * Width + x] == Biomes[1].colour)
                 {
 
@@ -390,78 +409,32 @@ public class Map_Generation : MonoBehaviour
                        // Debug.Log(average);
                     }
                 }
+                */
 
 
-                //average = System.Math.Round(average, 1);
 
 
-                //if (CurrentHeight > Biomes[2].height)
-                //{
-
-
-            }
+                }
         }
+        Map_Colour[28 * Width + 93] = Color.red;
+        /*
+        
+        Color[] mapcolours = Map_Colour;
+        for (int y = 0; y < Height - Height /2; y++)
+        {
+            for (int x = 0; x < Width - Width / 2; x++)
+            {
+                Map_Colour[y * Width + x] = mapcolours[Height - y - 1 * Width + Width - x -1];
 
 
+                    }
 
-       
+        }*/
+
 
 
     }
-        /*
-        for (int y = 0; y < Height - 1; y++)
-        {
-            for (int x = 0; x < Width - 1; x++)
-            {
-
-                float Check = bulidingMap[x + 1 * y];
-                float check2 = bulidingMap[x * y + 1];
-                float Check3 = bulidingMap[x + 1 * y + 1];
-
-
-                float average = bulidingMap[x * y] + Check + check2 + Check3;
-                average = average / 4;
-
-               
-
-
-                for (float i = 0; i < 10; i++)
-                {
-                    float finalHeight = 1;
-                    finalHeight -= (i / 10);
-                    if (average < finalHeight && average > (finalHeight - 0.1))
-                    {
-                        average = finalHeight;
-                        i = 20;
-                       // Debug.Log(average);
-                    }
-                }
-
-                if (l < 10)
-                {
-                    //Debug.Log(Check);
-                    Debug.Log(average);
-                    l++;
-                }
-                //}
-
-                    Map_Noise[x, y] = average;
-                    Map_Noise[x + 1, y + 1] = average;
-                    Map_Noise[x + 1, y] = average;
-                    Map_Noise[x, y + 1] = average;
-
-
-
-                }
-                // Map_Noise[x, y] = bulidingMap[x * y];
-                //  Map_Noise[x + 1, y + 1] = Map_Noise[x, y];
-                //   Map_Noise[x + 1, y] = Map_Noise[x, y];
-                //  Map_Noise[x, y + 1] = Map_Noise[x, y];
-
-            }
-        }
-        */
-    
+        
 
 
     public void randomgen()

@@ -21,33 +21,34 @@ public class EntityTracker : MonoBehaviour
     public int height;
 
     public Coords[,] MapIndex;
-    public float[,]  NoiseMap;
+    public float[,] NoiseMap;
 
     int[] MapIndexI;
 
     public List<Animal> Predators;
+    List<Coords> WaterTiles;
 
     void Start()
     {
         Instance = this;
-        Init();
+
     }
 
     //change to use species ENUM
     public void UpdateMap(int Prevx, int Prevy, int x, int y, Alive_entity Entiy)
     {
-        MapIndex[Prevx, Prevy].Creature = null;
+        //  MapIndex[Prevx, Prevy].Creature = null;
         //add creatures to list of things to avoid in pathfinding
-        MapIndex[x, y].Creature = Entiy;
-        MapIndexI = new int[width * height];
-        Debug.Log(width * height);
-         MapIndexI[24 * 24] = 5;
-       
+        //  MapIndex[x, y].Creature = Entiy;
+        // MapIndexI = new int[width * height];
+        //  Debug.Log(width * height);
+        //  MapIndexI[24 * 24] = 5;
+
     }
 
-    public float GetDistantance(Vector2 a, Vector2 b)
+    public float GetDistantance(int ax, int ay, int bx, int by)
     {
-        return (float)System.Math.Sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+        return (float)System.Math.Sqrt((ax - bx) * (ax - bx) + (ay - by) * (ay - by));
 
     }
 
@@ -58,110 +59,24 @@ public class EntityTracker : MonoBehaviour
 
         for (int i = 0; i < Predators.Count; i++)
         {
-            Vector2 a2;
-            a2.x = Predators[i].x;
-            a2.y = Predators[i].y;
 
-            Vector2 a1;
-            a1.x = x;
-            a1.y = y;
-
-            float distant = GetDistantance(a1, a2);
+            
+            float distant = GetDistantance(x, y, Predators[i].x, Predators[i].y);
 
 
             //add check for if prey to another predator
-            if (distant < Range)
+            if (distant < Range && distant > 0)
             {
                 PredatList.Add(Predators[i]);
             }
 
         }
-
-        return PredatList;
-
-
-
-
-
-
-
-
-
-
-
-
-        /*
-
-  
-        List<int> PredatList = new List<int>();
-
-        int combin = x + y;
-
-        for (int Sx = x - Range; Sx <= x + Range; x++)
-        {
-            for (int Yx = y + Range; Yx >= y - Range; y--)
-            {
-                if (MapIndexI[Sx * Yx] != 0 && Sx + Yx != combin)
-                {
-                    if (MapIndexI[Sx * Yx] > Specis)
-                    {
-
-                        PredatList.Add(Sx * Yx);
-                        // Debug.Log("added");
-                    }
-
-                }
-                else
-                {
-                    // Debug.Log("null");
-                }
-
-            }
-
-        }
-
-        return PredatList;
-
-
-
-
-
-
-
-
-
-
-
         
-        List<Alive_entity> PredatList = new List<Alive_entity>();
-
-        int combin = x + y;
-        
-        for (int Sx = x - Range; Sx <= x + Range; x++)
-        {
-            for  (int Yx = y + Range; Yx >= y - Range; y--)
-            {
-               if ( MapIndex[Sx,Yx].Creature != null && Sx + Yx != combin )
-                {
-                    if (MapIndex[Sx, Yx].Creature.Animal > Specis)
-                    {
-
-                        PredatList.Add(MapIndex[Sx, Yx].Creature);
-                       // Debug.Log("added");
-                    }
-                    
-                    }
-                else
-                {
-                   // Debug.Log("null");
-                }
-                
-            }
-
-        }
-
         return PredatList;
-        */
+
+
+
+
     }
 
 
@@ -180,33 +95,47 @@ public class EntityTracker : MonoBehaviour
 
 
 
-    } */
+    } 
     Vector2 FindWater(int x, int y)
     {
 
 
-    }
+    }*/
 
-    public virtual void Init()
+    public virtual void Init(Color[] Map_Colour, Color Biome2, int width, float[,] Noise)
     {
         //spawn species
+        //this.NoiseMap = NoiseMap;
 
         MapIndex = new Coords[width, height];
+        WaterTiles = new List<Coords>();
+        Coords watertile;
+        int lol = 0;
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
 
-                MapIndex[x, y] = new Coords(x,y);
+                MapIndex[x, y] = new Coords(x, y);
 
-               // if ( NoiseMap[x,y]  < 0.35)
-               // {
+                if (Map_Colour[x * 200 + y] == Biome2)
+                {
+                    //38 92
+                    //21 96
+                    lol++;
+                    MapIndex[x, y].IsWalkable = false;
+                    watertile = new Coords(x, y);
+                    WaterTiles.Add(watertile);
+                    Debug.Log(x);
+                    Debug.Log(y);
+                    Debug.Log("===========");
 
-                 //   MapIndex[x, y].IsWalkable = false;
-               // }
+                }
 
             }
         }
+
+        Debug.Log(lol);
     }
 
     ///moemnt shjould be handled in entity
@@ -221,6 +150,36 @@ public class EntityTracker : MonoBehaviour
         Grid.y = Pos.z / 10;
         Grid.y -= 0.5f;
         return Grid;
+    }
+
+    public Coords FindWater(int x, int y,int range)
+    {
+        Coords Tile = new Coords(-1,-1);
+        float Dist = range;
+
+
+
+        for (int i = 0; i < WaterTiles.Count; i++)
+        {
+            float Length = GetDistantance(x, y, WaterTiles[i].x, WaterTiles[i].y);
+            
+            if (Length < range)
+            {
+                Dist = Length;
+                Tile.x = WaterTiles[i].x;
+                Tile.y = WaterTiles[i].y;
+            }
+        }
+
+
+
+
+        return Tile;
+
+        
+        
+
+
     }
 
 
@@ -291,9 +250,10 @@ public class EntityTracker : MonoBehaviour
                 if (ClosedList.Contains(neighbourN)) continue;
 
                 //checks if can walk past terrain
-                if (!neighbourN.IsWalkable && !neighbourN.Creature)
+                if (neighbourN.IsWalkable == false )
                 {
                     ClosedList.Add(neighbourN);
+                    Debug.Log("notWalkable");
                     continue;
                 }
 

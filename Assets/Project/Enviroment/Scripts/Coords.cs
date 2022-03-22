@@ -21,13 +21,15 @@ public class Coords
     public bool IsWalkable;
     public bool IsWater;
     public bool Vegation;
-    public Alive_entity Creature;
+    // public Alive_entity Creature;
+    public bool Creature ;
     public Coords(int x, int y)
     {
         this.x = x;
         this.y = y;
         IsWalkable = true;
         LastCoord = null;
+        Creature = false;
         
     }
     
