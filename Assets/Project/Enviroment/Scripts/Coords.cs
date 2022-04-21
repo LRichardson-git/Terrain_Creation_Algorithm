@@ -10,6 +10,7 @@ public class Coords
     public int x;
     public int y;
 
+    public bool dead;
 
 
     public int m_gCost; //distance from start

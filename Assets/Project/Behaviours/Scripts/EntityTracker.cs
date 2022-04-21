@@ -27,6 +27,9 @@ public class EntityTracker : MonoBehaviour
 
     public List<Animal> Predators;
     List<Coords> WaterTiles;
+    public Dictionary<Species, List<Coords>> SpeciesMap;
+
+
 
     void Start()
     {
@@ -43,6 +46,12 @@ public class EntityTracker : MonoBehaviour
         // MapIndexI = new int[width * height];
         //  Debug.Log(width * height);
         //  MapIndexI[24 * 24] = 5;
+
+    }
+
+    public void RemoveEntity(Species speciy,  Coords Location )
+    {
+        SpeciesMap[speciy].Remove( Location);
 
     }
 
@@ -126,16 +135,20 @@ public class EntityTracker : MonoBehaviour
                     MapIndex[x, y].IsWalkable = false;
                     watertile = new Coords(x, y);
                     WaterTiles.Add(watertile);
-                    Debug.Log(x);
-                    Debug.Log(y);
-                    Debug.Log("===========");
+                    //Debug.Log(x);
+                  //  Debug.Log(y);
+                   // Debug.Log("===========");
 
                 }
 
             }
         }
 
-        Debug.Log(lol);
+        // Debug.Log(lol);
+        SpeciesMap = new Dictionary<Species, List<Coords>>();
+        SpeciesMap.Add(Species.Rabbit, new List<Coords>());
+
+        //SpeciesMap[Species.Rabbit].Add((Species) Species.Rabbit)];
     }
 
     ///moemnt shjould be handled in entity
@@ -253,7 +266,7 @@ public class EntityTracker : MonoBehaviour
                 if (neighbourN.IsWalkable == false )
                 {
                     ClosedList.Add(neighbourN);
-                    Debug.Log("notWalkable");
+                   // Debug.Log("notWalkable");
                     continue;
                 }
 
