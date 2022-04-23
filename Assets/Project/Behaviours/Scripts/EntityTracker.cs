@@ -6,53 +6,38 @@ using UnityEngine;
 //envir
 public class EntityTracker : MonoBehaviour
 {
-    // Start is called before the first frame update
-    public int seed;
-
-    public static bool[,] walkable;
-
-    private const int m_Move_Straight_Cost = 10;
-    private const int m_Move_Diagonal_cost = 14;
-
-    public Alive_entity[] index;
 
     public static EntityTracker Instance { get; private set; }
+
+    //general
+    public int seed;
     public int width;
     public int height;
-
+    
+    //Pathfinding
+    public static bool[,] walkable;
+    private const int m_Move_Straight_Cost = 10;
+    private const int m_Move_Diagonal_cost = 14;
     public Coords[,] MapIndex;
-    public float[,] NoiseMap;
 
-    int[] MapIndexI;
-
-    public List<Animal> Predators;
+    //water
     List<Coords> WaterTiles;
     List<Coords> WaterTilesAdjacent;
-    public Dictionary<Species, List<Coords>> SpeciesMap;
 
-
+   //storing lists o
+    public Dictionary<Species, List<Alive_entity>> SpeciesMap;
+    public Dictionary<Species, List<Species>> PreySpecies;
+    public Dictionary<Species, List<Species>> PredatorSpecies;
 
     void Start()
     {
         Instance = this;
-
     }
 
-    //change to use species ENUM
-    public void UpdateMap(int Prevx, int Prevy, int x, int y, Alive_entity Entiy)
-    {
-        //  MapIndex[Prevx, Prevy].Creature = null;
-        //add creatures to list of things to avoid in pathfinding
-        //  MapIndex[x, y].Creature = Entiy;
-        // MapIndexI = new int[width * height];
-        //  Debug.Log(width * height);
-        //  MapIndexI[24 * 24] = 5;
 
-    }
-
-    public void RemoveEntity(Species speciy,  Coords Location )
+    public void RemoveEntity(Species speciy,  Alive_entity Entity )
     {
-        SpeciesMap[speciy].Remove( Location);
+        SpeciesMap[speciy].Remove(Entity);
 
     }
 
@@ -62,67 +47,50 @@ public class EntityTracker : MonoBehaviour
 
     }
 
-    public List<Alive_entity> CheckPredators(int x, int y, int Range, int Specis)
+
+    public List<Alive_entity> CheckPredators(int x, int y, int Range, Species Specis)
     {
 
         List<Alive_entity> PredatList = new List<Alive_entity>();
 
-        for (int i = 0; i < Predators.Count; i++)
+        Debug.Log(Specis);
+
+        List<Species> PredatorSpeciesList = PredatorSpecies[Specis];
+        Debug.Log(PredatorSpeciesList.Count);
+        for (int i = 0; i < PredatorSpeciesList.Count; i++)
         {
 
-            
-            float distant = GetDistantance(x, y, Predators[i].x, Predators[i].y);
+            List<Alive_entity> PredSpecieL = SpeciesMap[PredatorSpeciesList[i]];
 
-
-            //add check for if prey to another predator
-            if (distant < Range && distant > 0)
+            for (int j = 0; j < PredSpecieL.Count; j++)
             {
-                PredatList.Add(Predators[i]);
-            }
+                float distant = GetDistantance(x, y, PredSpecieL[j].x, PredSpecieL[j].y);
 
+
+                //add check for if prey to another predator
+                if (distant < Range && distant > 0)
+                {
+                    PredatList.Add(PredSpecieL[j]);
+                }
+            }
         }
         
         return PredatList;
 
 
-
-
     }
 
-
-
-    /*
-    Coords CheckPrey()
-    {
-
-
-    }
-   
- 
-
-    Coords FindVegation()
-    {
-
-
-
-    } 
-    Vector2 FindWater(int x, int y)
-    {
-
-
-    }*/
 
     public virtual void Init(Color[] Map_Colour, Color Biome2, int width, float[,] Noise)
     {
-        //spawn species
-        //this.NoiseMap = NoiseMap;
 
         MapIndex = new Coords[width, height];
         WaterTiles = new List<Coords>();
         WaterTilesAdjacent = new List<Coords>();
         Coords watertile;
         Coords AdjancetTile;
-        int lol = 0;
+
+        //lopp through water
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -132,9 +100,8 @@ public class EntityTracker : MonoBehaviour
 
                 if (Map_Colour[x * 200 + y] == Biome2)
                 {
-                    //38 92
-                    //21 96
-                    lol++;
+
+
                     MapIndex[x, y].IsWalkable = false;
                     watertile = new Coords(x, y);
                     WaterTiles.Add(watertile);
@@ -197,38 +164,94 @@ public class EntityTracker : MonoBehaviour
                     }
 
 
-
-
-                    //Debug.Log(x);
-                    //  Debug.Log(y);
-                    // Debug.Log("===========");
-
                 }
 
             }
         }
 
-        // Debug.Log(lol);
-        SpeciesMap = new Dictionary<Species, List<Coords>>();
-        SpeciesMap.Add(Species.Rabbit, new List<Coords>());
 
-        //SpeciesMap[Species.Rabbit].Add((Species) Species.Rabbit)];
+
+        //create dictionarys for tracking entitiers and getting species
+    
+        SpeciesMap = new Dictionary<Species, List<Alive_entity>>();
+        SpeciesMap.Add(Species.Rabbit, new List<Alive_entity>());
+        SpeciesMap.Add(Species.fox, new List<Alive_entity>());
+
+
+        PreySpecies = new Dictionary<Species, List<Species>>();
+
+
+        //for now hardcode until otherwise
+        PredatorSpecies = new Dictionary<Species, List<Species>>();
+        PredatorSpecies.Add(Species.Rabbit, new List<Species>());
+        PredatorSpecies[(Species.Rabbit)].Add(Species.fox);
+        Debug.Log("inition done");
+      
     }
 
-    ///moemnt shjould be handled in entity
-    ///
+  
 
 
-    public Vector2 GetGrid(Vector3 Pos)
-    {
-        Vector2 Grid;
-        Grid.x = Pos.x / 10;
-        Grid.x -= 0.5f;
-        Grid.y = Pos.z / 10;
-        Grid.y -= 0.5f;
-        return Grid;
-    }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //Find nearest Water source
     public Coords closestWater(int x, int y)
     {
         Coords Tile = new Coords(-1, -1);
@@ -253,9 +276,9 @@ public class EntityTracker : MonoBehaviour
     }
 
 
-    public Coords FindWater(int x, int y,int range)
+    public Coords FindWater(int x, int y, int range)
     {
-        Coords Tile = new Coords(-1,-1);
+        Coords Tile = new Coords(-1, -1);
         float Dist = range;
 
 
@@ -263,7 +286,7 @@ public class EntityTracker : MonoBehaviour
         for (int i = 0; i < WaterTilesAdjacent.Count; i++)
         {
             float Length = GetDistantance(x, y, WaterTilesAdjacent[i].x, WaterTilesAdjacent[i].y);
-            
+
             if (Length < range)
             {
                 Dist = Length;
@@ -299,7 +322,7 @@ public class EntityTracker : MonoBehaviour
                     }
 
                 }
-                
+
             }
         }
 
@@ -309,23 +332,79 @@ public class EntityTracker : MonoBehaviour
 
 
 
-    public List<Vector3> FindPath (int xEnd, int yEnd,int xSt, int ySt)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //PathFinding
+
+    public Vector2 GetGrid(Vector3 Pos)
+    {
+        Vector2 Grid;
+        Grid.x = Pos.x / 10;
+        Grid.x -= 0.5f;
+        Grid.y = Pos.z / 10;
+        Grid.y -= 0.5f;
+        return Grid;
+    }
+
+
+    public List<Vector3> FindPath(int xEnd, int yEnd, int xSt, int ySt)
     {
         //Debug.Log("PATH");
-        Coords StarCoord = MapIndex[xSt,ySt];
-        Coords EndCoord = MapIndex[xEnd,yEnd];
-      //  List<Coords> FinalPath;
+        Coords StarCoord = MapIndex[xSt, ySt];
+        Coords EndCoord = MapIndex[xEnd, yEnd];
+        //  List<Coords> FinalPath;
 
         List<Coords> OpenList = new List<Coords> { StarCoord };
 
         List<Coords> ClosedList = new List<Coords>();
 
-       
+
 
 
 
         //calulate offset for position in world
-        
+
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -337,7 +416,7 @@ public class EntityTracker : MonoBehaviour
 
             }
         }
-        
+
 
         //now start calucalting the value of the startnode 
         //calulates cost between start node and node the object is trying to reach
@@ -374,10 +453,10 @@ public class EntityTracker : MonoBehaviour
                 if (ClosedList.Contains(neighbourN)) continue;
 
                 //checks if can walk past terrain
-                if (neighbourN.IsWalkable == false )
+                if (neighbourN.IsWalkable == false)
                 {
                     ClosedList.Add(neighbourN);
-                   // Debug.Log("notWalkable");
+                    // Debug.Log("notWalkable");
                     continue;
                 }
 
@@ -409,14 +488,14 @@ public class EntityTracker : MonoBehaviour
 
     public Vector3 Coordtoworld(Coords Transcoord)
     {
-        
+
         Vector3 Trans;
         Trans.x = Transcoord.x * 10 + 5;
         Trans.z = Transcoord.y * 10 + 5;
         Trans.y = 15;
-      //  Debug.Log(Transcoord.x);
-      //  Debug.Log(Transcoord.y);
-      //  Debug.Log(Trans);
+        //  Debug.Log(Transcoord.x);
+        //  Debug.Log(Transcoord.y);
+        //  Debug.Log(Trans);
         return Trans;
     }
 
@@ -456,7 +535,7 @@ public class EntityTracker : MonoBehaviour
         {
             path.Add(currentNode.LastCoord);
             currentNode = currentNode.LastCoord;
-           // Debug.Log(currentNode.LastCoord);
+            // Debug.Log(currentNode.LastCoord);
         }
         //since we work our way back we reverse the path list to get it form our starting point
         path.Reverse();
@@ -472,10 +551,10 @@ public class EntityTracker : MonoBehaviour
             List<Vector3> vectorPath = new List<Vector3>();
             foreach (Coords coord in path)
             {
-                
+
                 vectorPath.Add(Coordtoworld(coord));
 
-              // return vectorPath;
+                // return vectorPath;
             }
             //Debug.Log("retunr");
             return vectorPath;
