@@ -27,6 +27,7 @@ public class EntityTracker : MonoBehaviour
 
     public List<Animal> Predators;
     List<Coords> WaterTiles;
+    List<Coords> WaterTilesAdjacent;
     public Dictionary<Species, List<Coords>> SpeciesMap;
 
 
@@ -118,7 +119,9 @@ public class EntityTracker : MonoBehaviour
 
         MapIndex = new Coords[width, height];
         WaterTiles = new List<Coords>();
+        WaterTilesAdjacent = new List<Coords>();
         Coords watertile;
+        Coords AdjancetTile;
         int lol = 0;
         for (int x = 0; x < width; x++)
         {
@@ -135,9 +138,70 @@ public class EntityTracker : MonoBehaviour
                     MapIndex[x, y].IsWalkable = false;
                     watertile = new Coords(x, y);
                     WaterTiles.Add(watertile);
+
+                    if (x > 0 && x < 200 && y > 0 && y < 200) { 
+                    
+                        if (Map_Colour[x + 1 * 200 + y] != Biome2)
+                        {
+                        AdjancetTile = new Coords(x + 1, y);
+                        WaterTilesAdjacent.Add(AdjancetTile);
+                        }
+                       // Debug.Log(x - 1 * 200 + y);
+                       // Debug.Log( y);
+                        //Debug.Log((x - 1) * 200 + y);
+                        if (Map_Colour[(x - 1) * 200 + y] != Biome2)
+                        {
+                        AdjancetTile = new Coords(x - 1, y);
+                        WaterTilesAdjacent.Add(AdjancetTile);
+
+                    }
+                        if (Map_Colour[x  * 200 + y + 1] != Biome2)
+                        {
+                        AdjancetTile = new Coords(x, y + 1);
+                        WaterTilesAdjacent.Add(AdjancetTile);
+
+                    }
+
+                        if (Map_Colour[x * 200 + y - 1] != Biome2)
+                        {
+                        AdjancetTile = new Coords(x, y-1);
+                        WaterTilesAdjacent.Add(AdjancetTile);
+
+                    }
+
+                    if (Map_Colour[x + 1 * 200 + y + 1] != Biome2)
+                    {
+
+                        AdjancetTile = new Coords(x + 1, y + 1);
+                        WaterTilesAdjacent.Add(AdjancetTile);
+                    }
+                    if (Map_Colour[(x - 1) * 200 + y - 1] != Biome2)
+                    {
+
+                        AdjancetTile = new Coords(x - 1, y - 1);
+                        WaterTilesAdjacent.Add(AdjancetTile);
+                    }
+                    if (Map_Colour[(x - 1) * 200 + y + 1] != Biome2)
+                    {
+                        AdjancetTile = new Coords(x - 1, y + 1);
+                        WaterTilesAdjacent.Add(AdjancetTile);
+
+                    }
+                    if (Map_Colour[x + 1 * 200 + y - 1] != Biome2)
+                    {
+                        AdjancetTile = new Coords(x + 1, y - 1);
+                        WaterTilesAdjacent.Add(AdjancetTile);
+
+
+                    }
+                    }
+
+
+
+
                     //Debug.Log(x);
-                  //  Debug.Log(y);
-                   // Debug.Log("===========");
+                    //  Debug.Log(y);
+                    // Debug.Log("===========");
 
                 }
 
@@ -165,18 +229,18 @@ public class EntityTracker : MonoBehaviour
         return Grid;
     }
 
-    public Coords FindWater(int x, int y,int range)
+    public Coords closestWater(int x, int y)
     {
-        Coords Tile = new Coords(-1,-1);
-        float Dist = range;
+        Coords Tile = new Coords(-1, -1);
+        float Dist = 2;
 
 
 
-        for (int i = 0; i < WaterTiles.Count; i++)
+        for (int i = 0; i < WaterTilesAdjacent.Count; i++)
         {
             float Length = GetDistantance(x, y, WaterTiles[i].x, WaterTiles[i].y);
-            
-            if (Length < range)
+
+            if (Length < Dist)
             {
                 Dist = Length;
                 Tile.x = WaterTiles[i].x;
@@ -184,17 +248,64 @@ public class EntityTracker : MonoBehaviour
             }
         }
 
-
-
-
         return Tile;
-
-        
-        
-
 
     }
 
+
+    public Coords FindWater(int x, int y,int range)
+    {
+        Coords Tile = new Coords(-1,-1);
+        float Dist = range;
+
+
+
+        for (int i = 0; i < WaterTilesAdjacent.Count; i++)
+        {
+            float Length = GetDistantance(x, y, WaterTilesAdjacent[i].x, WaterTilesAdjacent[i].y);
+            
+            if (Length < range)
+            {
+                Dist = Length;
+                Tile.x = WaterTilesAdjacent[i].x;
+                Tile.y = WaterTilesAdjacent[i].y;
+            }
+        }
+
+        return Tile;
+
+    }
+    public Coords FindWaterAgain(int x, int y, int range, List<Coords> Unuseable)
+    {
+        Coords Tile = new Coords(-1, -1);
+        float Dist = range;
+
+
+
+        for (int i = 0; i < WaterTilesAdjacent.Count; i++)
+        {
+            float Length = GetDistantance(x, y, WaterTilesAdjacent[i].x, WaterTilesAdjacent[i].y);
+
+            if (Length < range)
+            {
+                for (int j = 0; j < Unuseable.Count; j++)
+                {
+                    if (WaterTilesAdjacent[i].x != Unuseable[j].x && WaterTilesAdjacent[i].y != Unuseable[j].y)
+                    {
+                        Dist = Length;
+                        Tile.x = WaterTilesAdjacent[i].x;
+                        Tile.y = WaterTilesAdjacent[i].y;
+
+                    }
+
+                }
+                
+            }
+        }
+
+        return Tile;
+
+    }
 
 
 

@@ -7,9 +7,8 @@ public class Animal : Alive_entity
 
    
 
-    public int movespeed = 3;
+    public int movespeed = 25;
 
-    
     float TimeBetweenACtions = 4;
     int previousPos;
     int CurrentPos;
@@ -27,13 +26,16 @@ public class Animal : Alive_entity
     float LastActionTime;
     //Constant once initiatied values
 
-    float MaxHunger = 10;
-    float MaxThirst = 10;
-    float TimetoDecompose = 10;
+    float MaxHunger = 200;
+    float MaxThirst = 200;
+    float TimetoDecompose = 90;
+    Actions CurrentAction;
 
+    //speed
 
-
-
+    float drinkSpeed = 7;
+    float eatSpeed = 11;
+    Alive_entity eating;
     //==================
     //STATUS
 
@@ -66,6 +68,10 @@ public class Animal : Alive_entity
     {
         //EntityTracker.Instance.SpeciesMap.Add(Species.Rabbit,)
         EntityTracker.Instance.SpeciesMap[(Species.Rabbit)].Add(Coordinate);
+
+        Vector3 pos = EntityTracker.Instance.Coordtoworld(Coordinate);
+        transform.position = pos;
+       
         //Coords lol12 = new Coords(x, y);
         //EntityTracker.Instance.SpeciesMap[(Species.Rabbit)].Add(lol12);
         //Debug.LogError("sdas");
@@ -111,13 +117,16 @@ public class Animal : Alive_entity
         if (Input.GetKeyDown("up"))
         {
             // if ( once < 1) { 
-            PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y) ;
-            Coords Temp = EntityTracker.Instance.FindWater(x, y, 10);
+            //PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y) ;
+            Coords Temp = EntityTracker.Instance.FindWater(x, y, 20);
             Debug.Log(Temp.x);
             Debug.Log(Temp.y);
-            //Debug.Log(PathList[0]);
-              //  }
-        }
+                tary = Temp.y;
+                Tarx = Temp.x;
+                PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y);
+                //Debug.Log(PathList[0]);
+                //  }
+            }
         if (Input.GetKeyDown("down"))
         {
             //Vector3 Pos = EntityTracker.Instance.Coordtoworld(Coordinate);
@@ -228,6 +237,31 @@ public class Animal : Alive_entity
             }
         }
         }
+    }
+
+
+    void UpdateStatus() { 
+    
+    if (CurrentAction == Actions.Drinking)
+        {
+            if (Thirst > 0)
+            {
+                Thirst -= Time.deltaTime * 1 / drinkSpeed;
+                Thirst = Mathf.Clamp01(Thirst);
+
+            }
+        } 
+
+    else  if (CurrentAction == Actions.Eating)
+        {
+
+            //
+        }
+    
+    
+    
+    
+    
     }
 
 
