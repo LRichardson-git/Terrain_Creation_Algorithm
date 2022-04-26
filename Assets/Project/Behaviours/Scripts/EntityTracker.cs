@@ -53,17 +53,18 @@ public class EntityTracker : MonoBehaviour
 
         List<Alive_entity> PredatList = new List<Alive_entity>();
 
-        Debug.Log(Specis);
+       // Debug.Log(Specis);
 
         List<Species> PredatorSpeciesList = PredatorSpecies[Specis];
-        Debug.Log(PredatorSpeciesList.Count);
         for (int i = 0; i < PredatorSpeciesList.Count; i++)
         {
 
+            
             List<Alive_entity> PredSpecieL = SpeciesMap[PredatorSpeciesList[i]];
 
             for (int j = 0; j < PredSpecieL.Count; j++)
             {
+                Debug.Log(j);
                 float distant = GetDistantance(x, y, PredSpecieL[j].x, PredSpecieL[j].y);
 
 
@@ -185,6 +186,7 @@ public class EntityTracker : MonoBehaviour
         PredatorSpecies = new Dictionary<Species, List<Species>>();
         PredatorSpecies.Add(Species.Rabbit, new List<Species>());
         PredatorSpecies[(Species.Rabbit)].Add(Species.fox);
+        vegation_manger.Instance.init();
         Debug.Log("inition done");
       
     }

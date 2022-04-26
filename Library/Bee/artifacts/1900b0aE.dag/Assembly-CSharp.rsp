@@ -323,6 +323,8 @@
 "Assets/Project/Behaviours/Scripts/Animal.cs"
 "Assets/Project/Behaviours/Scripts/Animal_Spawner.cs"
 "Assets/Project/Behaviours/Scripts/EntityTracker.cs"
+"Assets/Project/Behaviours/Scripts/vegation_manger.cs"
+"Assets/Project/Behaviours/Scripts/Vegtable.cs"
 "Assets/Project/Datatypes/Action.cs"
 "Assets/Project/Datatypes/ReasonForDeath.cs"
 "Assets/Project/Datatypes/Specie.cs"
