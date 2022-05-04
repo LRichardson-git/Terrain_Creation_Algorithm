@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Project\Enviroment\Scripts\MapMeshGenertion.cs" />
+    <Compile Include="Assets\Project\Behaviours\Scripts\Vegtable.cs" />
     <Compile Include="Assets\Project\Behaviours\Scripts\EntityTracker.cs" />
     <Compile Include="Assets\Project\Enviroment\Scripts\Mouselook.cs" />
     <Compile Include="Assets\Project\Enviroment\Scripts\Textures.cs" />
@@ -76,12 +77,11 @@
     <Compile Include="Assets\Project\Player\Inputs_handle.cs" />
     <Compile Include="Assets\Project\Enviroment\Scripts\Coords.cs" />
     <Compile Include="Assets\Project\Datatypes\Action.cs" />
+    <Compile Include="Assets\Project\Behaviours\Scripts\vegation_manger.cs" />
     <Compile Include="Assets\Project\Enviroment\Scripts\Map_Generation.cs" />
     <Compile Include="Assets\Project\Enviroment\Scripts\Erosion.cs" />
     <Compile Include="Assets\Project\Behaviours\Scripts\Alive_entity.cs" />
     <Compile Include="Assets\Project\Enviroment\References\FastNoise.cs" />
-    <Compile Include="Assets\Project\Behaviours\Scripts\Vegtable.cs" />
-    <Compile Include="Assets\Project\Behaviours\Scripts\vegation_manger.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
