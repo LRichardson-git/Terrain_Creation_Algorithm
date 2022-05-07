@@ -91,8 +91,11 @@ public class Animal : Alive_entity
  
   
             }
-   
-        float TimeSinceLastAction = Time.time - LastActionTime;
+
+            
+           
+
+            float TimeSinceLastAction = Time.time - LastActionTime;
 
         if (TimeSinceLastAction > TimeBetweenACtions)
         {
@@ -151,12 +154,12 @@ public class Animal : Alive_entity
             {
 
                 Fruit_target = vegation_manger.Instance.FindVegatble(x, y, 10, Specie);
-                Debug.Log(Fruit_target.x);
-                if (Fruit_target.x != -1)
+                Debug.Log(Fruit_target.xy.x);
+                if (Fruit_target.xy.x != -1)
                 {
                     CurrentAction = Actions.Goingtofood;
-                    Tarx = Fruit_target.x;
-                    tary = Fruit_target.y;
+                    Tarx = Fruit_target.xy.x;
+                    tary = Fruit_target.xy.y;
                     PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y);
 
 
@@ -176,7 +179,7 @@ public class Animal : Alive_entity
 
 
         
-        if (CurrentAction == Actions.Goingtofood && x == Fruit_target.x && y == Fruit_target.y && Fruit_target != null)
+        if (CurrentAction == Actions.Goingtofood && x == Fruit_target.xy.x && y == Fruit_target.xy.y && Fruit_target != null)
         {
             CurrentAction = Actions.Eating;
 
@@ -323,7 +326,7 @@ public class Animal : Alive_entity
 
 
             // Vector3 Temp = EntityTracker.Instance.GetGrid(newPos);
-            Vector3 Temp = EntityTracker.Instance.GetGrid(transform.position);
+            Vector2 Temp = EntityTracker.Instance.GetGrid(transform.position);
 
             x = (int)Temp.x;
             y = (int)Temp.y;

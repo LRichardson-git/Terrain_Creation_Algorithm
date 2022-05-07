@@ -6,13 +6,12 @@ public class Vegtable : MonoBehaviour
 {
 
     public Vegetion type;
-    public int x;
-    public int y;
+    public Coords xy;
 
 
     public void eaten ()
     {
-        vegation_manger.Instance.removeVeg(type, this);
+        vegation_manger.Instance.removeVeg(type, this, xy);
         Destroy(gameObject);
 
 

@@ -137,9 +137,9 @@ public class Map_Generation : MonoBehaviour
         
         //Create references to scripts that generate buildings, map and vegation
         Display_Map Display = FindObjectOfType<Display_Map>();
-        Building_Generator Buildings_gen = FindObjectOfType<Building_Generator>();
+        
         Vegation veg = FindObjectOfType<Vegation>();
-        Animal_Spawner animalS = FindObjectOfType<Animal_Spawner>(); ;
+
 
 
         //Just noise map
@@ -314,7 +314,7 @@ public class Map_Generation : MonoBehaviour
                 //loop through each biome to see what this current height falls within
                 for (int i = 0; i < Biomes.Length; i++)
                 {
-                    if (CurrentHeight <= Biomes[i].height)
+                    if (CurrentHeight <= Biomes[i].height) //xD
                     {
                         Map_Colour[y * Width + x] = Biomes[i].colour;
                         //found biome so can move one
@@ -332,10 +332,11 @@ public class Map_Generation : MonoBehaviour
 
         if (Input.GetKeyDown("down"))
         {
-            // if ( once < 1) { 
+            
             EntityTracker.Instance.Init(Map_Colour, Biomes[1].colour, Width, Map_Noise2);
-            //Debug.Log(PathList[0]);
-            //  }
+            vegation_manger.Instance.init(Map_Colour, Biomes[1].colour, Biomes[5].colour);
+            
+            
         }
     }
 

@@ -9,8 +9,9 @@ public enum Vegetion
 {
     carrot = 0,
     tomatoes = 1,
-    letuce, berries = 2,
-    apples = 3
+    letuce = 2, 
+    berries = 3,
+    apples = 4
 
 
 

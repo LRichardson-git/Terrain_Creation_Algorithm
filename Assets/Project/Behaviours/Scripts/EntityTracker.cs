@@ -186,7 +186,7 @@ public class EntityTracker : MonoBehaviour
         PredatorSpecies = new Dictionary<Species, List<Species>>();
         PredatorSpecies.Add(Species.Rabbit, new List<Species>());
         PredatorSpecies[(Species.Rabbit)].Add(Species.fox);
-        vegation_manger.Instance.init();
+        
         Debug.Log("inition done");
       
     }
@@ -494,7 +494,7 @@ public class EntityTracker : MonoBehaviour
         Vector3 Trans;
         Trans.x = Transcoord.x * 10 + 5;
         Trans.z = Transcoord.y * 10 + 5;
-        Trans.y = 15;
+        Trans.y = 5;
         //  Debug.Log(Transcoord.x);
         //  Debug.Log(Transcoord.y);
         //  Debug.Log(Trans);

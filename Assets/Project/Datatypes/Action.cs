@@ -12,3 +12,11 @@ public enum Actions
     chasing,
 
 }
+
+public enum Season
+{
+ Summer,
+ fall,
+ autum,
+ winter
+};
