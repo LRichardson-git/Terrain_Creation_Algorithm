@@ -92,8 +92,15 @@ public class Animal : Alive_entity
   
             }
 
-            
-           
+            if (Input.GetKeyDown("up"))
+            {
+                vegation_manger.Instance.SpreadSeeds();
+                vegation_manger.Instance.Debuging();
+                Debug.Log("seededSpreaded");
+
+
+            }
+
 
             float TimeSinceLastAction = Time.time - LastActionTime;
 

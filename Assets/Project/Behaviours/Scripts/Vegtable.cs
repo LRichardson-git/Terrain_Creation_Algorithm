@@ -8,6 +8,13 @@ public class Vegtable : MonoBehaviour
     public Vegetion type;
     public Coords xy;
 
+    public Vegtable(Coords xy, Vegetion type)
+    {
+        this.xy = xy;
+        this.type = type;
+  
+
+    }
 
     public void eaten ()
     {
