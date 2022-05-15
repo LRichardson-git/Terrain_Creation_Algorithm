@@ -94,10 +94,7 @@ public class Animal : Alive_entity
 
             if (Input.GetKeyDown("up"))
             {
-                vegation_manger.Instance.SpreadSeeds();
-                vegation_manger.Instance.Debuging();
-                Debug.Log("seededSpreaded");
-
+            
 
             }
 
@@ -161,7 +158,7 @@ public class Animal : Alive_entity
             {
 
                 Fruit_target = vegation_manger.Instance.FindVegatble(x, y, 10, Specie);
-                Debug.Log(Fruit_target.xy.x);
+                //Debug.Log(Fruit_target.xy.x);
                 if (Fruit_target.xy.x != -1)
                 {
                     CurrentAction = Actions.Goingtofood;

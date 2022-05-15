@@ -4,33 +4,50 @@ using UnityEngine;
 
 public class vegation_manger : MonoBehaviour
 {
+
+    //Instance
     public static vegation_manger Instance { get; private set; }
+
+    //Prefabs
+    public Vegtable Vegation_Prefab;
+
+
+
+    //Dictaronrys for vegtbales
     Dictionary<Species, List<Vegetion>> Eatablevegatblesbyspecies;
     Dictionary<Vegetion, List<Vegtable>> ListofVegtables;
     Dictionary<Season, List<Vegetion>> VegetionBySeason;
-    public Vegtable Vegation_Prefab;
+
+    //References to map
     Color[] Colour_Map;
     Color ColourWater;
     Color colourRock;
+
+    //lists containing known vegtable and vegtable seed locations
     List<Vegtable> VegtableSeeds;
-    //PUT PREFABS FOR ALL VEGTABLES HERE
-    public int tiles = 40000;
-
-    Coords VegCord;
-    List<Vegetion> Vegtbles;
     List<Coords> Locations;
+
+    //repeated data types that a reused to save memory
     Vector3 location;
+    Coords VegCord;
+
+    //Season data
     Season currentSeason;
+    public int SpreadSeedChance = 5;
 
-    // Coords possibleCoord;
+    //List of vegetion that spawns per season
+    public List<Vegetion> Summer;
+    public List<Vegetion> Augest;
+    public List<Vegetion> Fall;
+    public List<Vegetion> Winter;
+    
+    //Data for spawning vegtables, and real time updates
+    public int SpawnAmount = 30;
+    float LastWeek;
+    float TimeBetweenWeeks = 30;
+    float week = 0;
 
 
-
-
-
-
-
-    // Start is called before the first frame update
     void Start()
     {
         Instance = this;
@@ -39,18 +56,35 @@ public class vegation_manger : MonoBehaviour
 
     public void init(Color[] Map_Colour, Color WaterColour, Color RockColour)
     {
+
+        //Set references from map creation
         Colour_Map = Map_Colour;
         ColourWater = WaterColour;
         colourRock = RockColour;
 
+        //Create lists
         Locations = new List<Coords>();
-        
-
-
-
-
         VegtableSeeds = new List<Vegtable>();
 
+
+
+        //for spread seed
+        VegetionBySeason = new Dictionary<Season, List<Vegetion>>();
+        VegetionBySeason.Add(Season.Summer, new List<Vegetion>());
+        VegetionBySeason.Add(Season.fall, new List<Vegetion>());
+        VegetionBySeason.Add(Season.autum, new List<Vegetion>());
+        VegetionBySeason.Add(Season.winter, new List<Vegetion>());
+
+        VegetionBySeason[Season.Summer] = Summer;
+        VegetionBySeason[Season.fall] = Fall;
+        VegetionBySeason[Season.autum] = Augest;
+        VegetionBySeason[Season.winter] = Winter;
+
+
+
+
+
+        //Set up dictationiers
         Eatablevegatblesbyspecies = new Dictionary<Species, List<Vegetion>>();
         Eatablevegatblesbyspecies.Add(Species.Rabbit, new List<Vegetion>());
         Eatablevegatblesbyspecies.Add(Species.fox, new List<Vegetion>());
@@ -60,12 +94,15 @@ public class vegation_manger : MonoBehaviour
         Eatablevegatblesbyspecies[(Species.Rabbit)].Add(Vegetion.apples);
 
 
+        //set up liss in dictonaries
         ListofVegtables = new Dictionary<Vegetion, List<Vegtable>>();
         ListofVegtables.Add(Vegetion.carrot, new List<Vegtable>());
         ListofVegtables.Add(Vegetion.apples, new List<Vegtable>());
         ListofVegtables.Add(Vegetion.letuce, new List<Vegtable>());
+        ListofVegtables.Add(Vegetion.tomatoes, new List<Vegtable>());
 
 
+        //Create a carrot in the world (game wont work when I dlete this for some reason
         VegCord = new Coords(35, 95);
         location = EntityTracker.Instance.Coordtoworld(VegCord);
         Vegtable NewVeg = Instantiate(Vegation_Prefab, location, Quaternion.identity);
@@ -77,32 +114,95 @@ public class vegation_manger : MonoBehaviour
         Locations.Add(NewVeg.xy);
 
 
-        SpawnVegtablesoftype(10, Vegetion.carrot);
+
+        //Create initial vegtables
+        NewSeasonVegtables(currentSeason);
+
 
     }
 
-    //spawn inital vegtables function
-    //seeds fall function
-    //spawn seeds function
-    //NEW season, spawn new new types of vegtables
-    // none season vegtables die function 
 
-    //season enum
+    void Update()
+    {
+
+
+
+        float TimeSinceLastAction = Time.time - LastWeek;
+
+        //7 minutes passed == one week in game
+        if (TimeSinceLastAction > TimeBetweenWeeks)
+        {
+
+            Debug.Log("week passed");
+
+            week++;
+
+            if (week == 1)
+                SpreadSeeds(currentSeason);
+
+
+            else if (week == 3)
+                spawnSeeds();
+
+
+            else if (week > 3)
+            {
+                if (currentSeason == Season.winter)
+                    currentSeason = Season.Summer;
+                else 
+                    currentSeason++;
+
+                week = 0;
+                NewSeasonVegtables(currentSeason);
+
+
+            }
+
+            LastWeek = Time.time;
+        }
+    }
+
+
+
 
     public void NewSeasonVegtables(Season Type)
     {
+
+
         switch (Type)
         {
             case Season.Summer:
-
-
+                
+                for (int i = 0; i < Summer.Count; i++) {
+                    SpawnAmount = Random.Range(SpawnAmount - 10, SpawnAmount);
+                    SpawnVegtablesoftype(SpawnAmount, Summer[i]);
+                    }
                 break;
 
+            case Season.fall:
 
+                for (int i = 0; i < Fall.Count; i++) { 
+                SpawnAmount = Random.Range(SpawnAmount - 12, SpawnAmount - 5);
+                SpawnVegtablesoftype(SpawnAmount, Fall[i]);
+                }
+                break;
+
+            case Season.autum:
+
+                for (int i = 0; i < Augest.Count; i++) {
+                    SpawnAmount = Random.Range(SpawnAmount - 15, SpawnAmount - 6);
+                    SpawnVegtablesoftype(SpawnAmount, Augest[i]);
+                }
+                break;
+
+            case Season.winter:
+
+                SpawnAmount = Random.Range(1, 10);
+                for (int i = 0; i < Winter.Count; i++)
+                    SpawnVegtablesoftype(SpawnAmount, Winter[i]);
+                break;
 
         }
-
-
 
 
     }
@@ -119,6 +219,7 @@ public class vegation_manger : MonoBehaviour
         int TemporyAmount = 0;
         while (TemporyAmount < amount)
         {
+            //chose random location
             int rInt = Random.Range(0, 200);
             int rYnt = Random.Range(0, 200);
 
@@ -129,16 +230,18 @@ public class vegation_manger : MonoBehaviour
 
                     if (rInt != Locations[i].x && rYnt != Locations[i].y)
                     {
-                        //SPAWN THE THING
+                        //Spawn vegtable if passed checks
                         VegCord.x = rInt;
                         VegCord.y = rYnt;
+
                         location = EntityTracker.Instance.Coordtoworld(VegCord);
                         location.y -= 4;
+
                         Vegtable NewVeg = Instantiate(Vegation_Prefab, location, Quaternion.identity);
                         NewVeg.type = type;
-
-                        //VEG EEEE TION == enum
                         NewVeg.xy = new Coords(rInt, rYnt);
+
+                        //add to dictariony and location list
                         ListofVegtables[(type)].Add(NewVeg);
                         Locations.Add(NewVeg.xy);
                         TemporyAmount++;
@@ -161,29 +264,48 @@ public class vegation_manger : MonoBehaviour
     }
 
 
-
-    public void SpreadSeeds()
+    //spawn seeds located on the map
+    public void spawnSeeds()
     {
-        //Season season  << {put in the thingy at top
+
+        for (int i = 0; i < VegtableSeeds.Count; i++)
+        {
+            location = EntityTracker.Instance.Coordtoworld(VegtableSeeds[i].xy);
+            location.y -= 4;
+
+            Vegtable NewVeg = Instantiate(Vegation_Prefab, location, Quaternion.identity);
+            NewVeg.type = VegtableSeeds[i].type;
+            NewVeg.xy = VegtableSeeds[i].xy;
+            ListofVegtables[(NewVeg.type)].Add(NewVeg);
+            //dont have to add to location since already has the coord
+            
+
+        }
+
+    }
+
+
+
+    public void SpreadSeeds(Season SeasonVeg)
+    {
+
         List<Coords> tempVegLocations = new List<Coords>();
-        //List<Vegetion> TempEnumList = VegetionBySeason[season];
-        List<Vegetion> TempEnumList = new List<Vegetion>();
-        TempEnumList.Add(Vegetion.carrot);
+        List<Vegetion> TempEnumList = VegetionBySeason[SeasonVeg];
         List<Coords> PossibleSpawns = new List<Coords>();
 
-        
 
         for (int i = 0; i < TempEnumList.Count; i++)
         {
-
             List<Vegtable> TempVegList = ListofVegtables[TempEnumList[i]];
            
-
             for (int j = 0; j < TempVegList.Count; j++)
             {
 
-                //spawn random location in area that isnt occupied
-               tempVegLocations = new List<Coords>();
+                int Chance = Random.Range(0, SpreadSeedChance); // random chance to spread seed
+                if (Chance > 1)
+                    continue;
+
+                tempVegLocations = new List<Coords>();
 
                 for (int k = 0; k < Locations.Count; k++)
                 {
@@ -192,17 +314,16 @@ public class vegation_manger : MonoBehaviour
                     if ( length < 2)
                     {
                         
-                        tempVegLocations.Add(Locations[k]);
+                        tempVegLocations.Add(Locations[k]); //check to see if location already occupied by a vegtable
 
                     }
                 }
-                //  Debug.Log("here");
+
+
                 PossibleSpawns = new List<Coords>();
                 if (tempVegLocations.Count < 8)
                 {
 
-                    
-                   
 
                     //loop through 3x3 square around vegtable
                     for (int x = TempVegList[j].xy.x - 1; x <= TempVegList[j].xy.x + 1; x++)
@@ -228,81 +349,31 @@ public class vegation_manger : MonoBehaviour
                                         break;
 
 
-                                            
                                         }
-
-
-
                                     }
-                                
-                               
-
-                                
-
-
                             }
-
-
                         }
                     }
-
-
-
-
-
-
-
                 }
-
-
 
                 if (PossibleSpawns.Count > 0)
                 {
                     
-                    int Rand = Random.Range(0, PossibleSpawns.Count);
-                 //   Debug.Log(PossibleSpawns.Count);
-                  //  Debug.Log(Rand);
-                   // Debug.Log(PossibleSpawns[Rand].x);
-                   // Debug.Log(TempVegList[j].type);
+                    int Rand = Random.Range(0, PossibleSpawns.Count); // randomly choose on the possible spawn locations for the seed
+
                     Vegtable SeededVeg; 
-                      SeededVeg  = new Vegtable(PossibleSpawns[Rand], TempVegList[j].type);
+                    SeededVeg  = new Vegtable(PossibleSpawns[Rand], TempVegList[j].type);
                    
                     //add to locations and seed list
-
                     Locations.Add(PossibleSpawns[Rand]);
                     VegtableSeeds.Add(SeededVeg);
 
                 }
-
-
-
-
-
-
-
             }
-
-
-
-
-
-
-
         }
     }
 
-    public void Debuging()
-    {
-        for (int i = 0; i < VegtableSeeds.Count; i++)
-        {
-            Debug.Log("vegSeed");
-            Debug.Log(VegtableSeeds[i].xy.x);
-            Debug.Log(VegtableSeeds[i].xy.y);
 
-        }
-
-
-    }
 
 
     public void removeVeg(Vegetion VegType, Vegtable veg, Coords Loca)
@@ -311,6 +382,7 @@ public class vegation_manger : MonoBehaviour
         Locations.Remove(Loca);
 
     }
+
     public Vegtable FindVegatble(int x, int y, int range, Species Specis)
     {
 
@@ -346,20 +418,8 @@ public class vegation_manger : MonoBehaviour
 
 
         return returnvegtable;
-
-
-
     }
 
 
-
-
-
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
 }

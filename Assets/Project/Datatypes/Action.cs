@@ -15,8 +15,8 @@ public enum Actions
 
 public enum Season
 {
- Summer,
- fall,
- autum,
- winter
+ Summer = 0,
+ fall = 1,
+ autum = 2,
+ winter = 3
 };
