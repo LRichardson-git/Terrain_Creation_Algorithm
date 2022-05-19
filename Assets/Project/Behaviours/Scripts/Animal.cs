@@ -9,12 +9,24 @@ public class Animal : Alive_entity
     //General
     float LastActionTime;
     float TimeBetweenACtions = 4;
-    public int range;
+    
 
     //speeds
     float drinkSpeed = 7;
     float eatSpeed = 11;
-    public int movespeed = 25;
+    public float movespeed = 20;
+
+    //Genes
+
+    Color Matcolour;
+    public int range;
+    int repoduction;
+    int desirabilty;
+    int gestation;
+    bool isfemale;
+    bool colorChange;
+
+    int[] geneValues; //speed. colour. range. reproduction urge. desribilty. gestation period. is female. hunger. thirst
 
     //Pathfinding
     int previousPos;
@@ -48,20 +60,46 @@ public class Animal : Alive_entity
     public Actions CurrentAction;
 
 
-    void Start()
+ 
+    public void init(int[] GeneValues, Coords Position)
     {
-        Coordinate = new Coords(x, y);
-        previousPos = x + y;
-        CurrentPos = x + y;
 
-    }
 
-    private void init()
-    {
-        Vector3 pos = EntityTracker.Instance.Coordtoworld(Coordinate);
+        //value setups
+        Vector3 pos = EntityTracker.Instance.Coordtoworld(Position);
         transform.position = pos;
-        //EntityTracker.Instance.SpeciesMap[(Species.Rabbit)].Add( this);
-        
+        geneValues = new int[10];
+        geneValues = GeneValues;
+        Coordinate = Position;
+        x = Coordinate.x;
+        y = Coordinate.y;
+
+
+        //Gene setup
+        movespeed +=  geneValues[0] * 0.2f ;
+        if (geneValues[1] > 225) // randomize colour if this gene passes test
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                Matcolour[i] = Random.Range(0f, 1f);
+
+            }
+        }
+
+
+        range = geneValues[2] / 25 ;
+        repoduction = geneValues[3];
+        desirabilty = geneValues[4];
+        gestation = geneValues[5];
+        if (geneValues[6] > 125)
+            isfemale = true;
+        MaxHunger += geneValues[7] / 2;
+        MaxThirst += geneValues[7] / 3;
+
+        //hungerir and thirstier faster if quicker
+        MaxHunger -= ((movespeed / 2) + (movespeed / 5));
+        MaxThirst -= ((movespeed / 2) + (movespeed / 3));
+
     }
 
 
@@ -87,8 +125,8 @@ public class Animal : Alive_entity
 
             if (Input.GetKeyDown("down"))
         {
-                init();
- 
+                // init();
+               
   
             }
 
@@ -231,6 +269,15 @@ public class Animal : Alive_entity
     }
 
 
+
+
+
+
+
+
+
+
+
     void checkforPredators()
     {
 
@@ -334,6 +381,8 @@ public class Animal : Alive_entity
 
             x = (int)Temp.x;
             y = (int)Temp.y;
+            Coordinate.x = x;
+            Coordinate.y = y;
             CurrentPos = x + y;
 
             if (previousPos != CurrentPos)

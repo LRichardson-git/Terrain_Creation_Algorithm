@@ -13,7 +13,8 @@ public class EntityTracker : MonoBehaviour
     public int seed;
     public int width;
     public int height;
-    
+    Color[] Colour_Map;
+
     //Pathfinding
     public static bool[,] walkable;
     private const int m_Move_Straight_Cost = 10;
@@ -23,11 +24,19 @@ public class EntityTracker : MonoBehaviour
     //water
     List<Coords> WaterTiles;
     List<Coords> WaterTilesAdjacent;
+    
 
    //storing lists o
     public Dictionary<Species, List<Alive_entity>> SpeciesMap;
     public Dictionary<Species, List<Species>> PreySpecies;
     public Dictionary<Species, List<Species>> PredatorSpecies;
+
+    //Prefabs
+    public List<Animal> Alive_Entities_Prefabs;
+    List<Species> SpeciesTypeList;
+    Vector3 TempLoc;
+
+
 
     void Start()
     {
@@ -90,7 +99,12 @@ public class EntityTracker : MonoBehaviour
         WaterTilesAdjacent = new List<Coords>();
         Coords watertile;
         Coords AdjancetTile;
+        Colour_Map = Map_Colour;
+      
 
+        SpeciesTypeList = new List<Species>();
+        SpeciesTypeList.Add(Species.Rabbit);
+        SpeciesTypeList.Add(Species.fox);
         //lopp through water
         for (int x = 0; x < width; x++)
         {
@@ -186,7 +200,8 @@ public class EntityTracker : MonoBehaviour
         PredatorSpecies = new Dictionary<Species, List<Species>>();
         PredatorSpecies.Add(Species.Rabbit, new List<Species>());
         PredatorSpecies[(Species.Rabbit)].Add(Species.fox);
-        
+
+        SpawnInitalAnimals(3, Biome2);
         Debug.Log("inition done");
       
     }
@@ -195,9 +210,61 @@ public class EntityTracker : MonoBehaviour
 
 
 
+    public void spawnAnimalAt(Coords Spawn, int[]GeneValues, int specie)
+    {
+        TempLoc = EntityTracker.Instance.Coordtoworld(Spawn);
+        Animal NewEntity = Instantiate(Alive_Entities_Prefabs[specie], TempLoc, Quaternion.identity);
+        NewEntity.init(GeneValues, Spawn);
+        SpeciesMap[(SpeciesTypeList[specie])].Add(NewEntity);
+
+
+        //add to dictariony and location list
+
+
+    }
+
+
+    public void SpawnInitalAnimals(int amount, Color Biome2)
+    {
+        int[] genevalues = new int[10];
+
+
+        for (int i = 0; i < Alive_Entities_Prefabs.Count; i++)
+        {
+
+            int TemporyAmount = 0;
+            while (TemporyAmount < amount)
+            {
+                //chose random location
+                int rInt = Random.Range(0, 200);
+                int rYnt = Random.Range(0, 200);
 
 
 
+                if (Colour_Map[rInt * 200 + rYnt] != Biome2)
+                {
+
+                    //Spawn vegtable if passed checks
+
+                    Coords tempC = new Coords(rInt, rYnt);
+
+                    for (int k = 0; k < genevalues.Length; k++)
+                    {
+                        genevalues[k] = Random.Range(0, 255);
+                    }
+
+                    spawnAnimalAt(tempC, genevalues, i);
+
+                    
+                    TemporyAmount++;
+
+                }
+
+
+            }
+        }
+
+    }
 
 
 

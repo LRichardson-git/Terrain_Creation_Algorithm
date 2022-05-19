@@ -95,8 +95,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 420225f2e01149a4e84196bdc294fdff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Material: {fileID: 0}
-  movespeed: 3
-  HP: 10
   x: 1
   y: 1
+  Reason: 0
+  material: {fileID: 0}
+  Specie: 0
+  food: 10
+  HP: 10
+  movespeed: 3
+  range: 4
+  Tarx: 0
+  tary: 0
+  Hunger: 0
+  Thirst: 0
+  decompose: 0
+  CurrentAction: 0

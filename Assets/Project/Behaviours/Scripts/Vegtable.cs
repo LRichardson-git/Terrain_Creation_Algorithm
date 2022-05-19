@@ -16,6 +16,11 @@ public class Vegtable : MonoBehaviour
 
     }
 
+    public void Init(Coords Pos, Vegetion VegType)
+    {
+        
+    }
+
     public void eaten ()
     {
         vegation_manger.Instance.removeVeg(type, this, xy);
