@@ -386,6 +386,8 @@ public class vegation_manger : MonoBehaviour
     public Vegtable FindVegatble(int x, int y, int range, Species Specis)
     {
 
+      //  Debug.Log("finding");
+
         Coords lol2 = new Coords(-1, -1);
         Vegtable returnvegtable = new Vegtable(lol2,Vegetion.carrot);
 
@@ -406,12 +408,13 @@ public class vegation_manger : MonoBehaviour
 
                 // Debug.Log(j);
                 float distant = EntityTracker.Instance.GetDistantance(x, y, VegtableList[j].xy.x, VegtableList[j].xy.y);
-
+                //Debug.Log("dist");
 
                 //add check for if prey to another predator
                 if (distant < range && distant > 0)
                 {
                     returnvegtable = VegtableList[j];
+                    //Debug.Log("distss");
                 }
             }
         }

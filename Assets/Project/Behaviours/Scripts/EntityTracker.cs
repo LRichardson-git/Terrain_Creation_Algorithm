@@ -14,6 +14,7 @@ public class EntityTracker : MonoBehaviour
     public int width;
     public int height;
     Color[] Colour_Map;
+    List<Coords> GroupCentre;
 
     //Pathfinding
     public static bool[,] walkable;
@@ -30,6 +31,7 @@ public class EntityTracker : MonoBehaviour
     public Dictionary<Species, List<Alive_entity>> SpeciesMap;
     public Dictionary<Species, List<Species>> PreySpecies;
     public Dictionary<Species, List<Species>> PredatorSpecies;
+    
 
     //Prefabs
     public List<Animal> Alive_Entities_Prefabs;
@@ -49,6 +51,8 @@ public class EntityTracker : MonoBehaviour
         SpeciesMap[speciy].Remove(Entity);
 
     }
+
+    
 
     public float GetDistantance(int ax, int ay, int bx, int by)
     {
@@ -100,7 +104,7 @@ public class EntityTracker : MonoBehaviour
         Coords watertile;
         Coords AdjancetTile;
         Colour_Map = Map_Colour;
-      
+        GroupCentre = new List<Coords>();
 
         SpeciesTypeList = new List<Species>();
         SpeciesTypeList.Add(Species.Rabbit);
@@ -201,7 +205,7 @@ public class EntityTracker : MonoBehaviour
         PredatorSpecies.Add(Species.Rabbit, new List<Species>());
         PredatorSpecies[(Species.Rabbit)].Add(Species.fox);
 
-        SpawnInitalAnimals(3, Biome2);
+        SpawnInitalAnimals(1, Biome2, 1);
         Debug.Log("inition done");
       
     }
@@ -210,11 +214,14 @@ public class EntityTracker : MonoBehaviour
 
 
 
-    public void spawnAnimalAt(Coords Spawn, int[]GeneValues, int specie)
+    public void spawnAnimalAt(Coords Spawn, int[]GeneValues, int specie, int index)
     {
+        Spawn.x = 30;
+        Spawn.y = 85;
         TempLoc = EntityTracker.Instance.Coordtoworld(Spawn);
+        
         Animal NewEntity = Instantiate(Alive_Entities_Prefabs[specie], TempLoc, Quaternion.identity);
-        NewEntity.init(GeneValues, Spawn);
+        NewEntity.init(GeneValues, Spawn, GroupCentre[index]);
         SpeciesMap[(SpeciesTypeList[specie])].Add(NewEntity);
 
 
@@ -224,47 +231,96 @@ public class EntityTracker : MonoBehaviour
     }
 
 
-    public void SpawnInitalAnimals(int amount, Color Biome2)
+    public void SpawnInitalAnimals(int amount, Color Biome2, int groups)
     {
         int[] genevalues = new int[10];
 
 
-        for (int i = 0; i < Alive_Entities_Prefabs.Count; i++)
+        int Index = 0;
+
+        //check for max size here
+
+        while (Index < groups)
         {
 
-            int TemporyAmount = 0;
-            while (TemporyAmount < amount)
+            int rInt = Random.Range(0, 190);
+            int rYnt = Random.Range(0, 190);
+
+
+            Coords tempC = new Coords(rInt, rYnt);
+
+            if (GroupCentre.Count < 1)
             {
-                //chose random location
-                int rInt = Random.Range(0, 200);
-                int rYnt = Random.Range(0, 200);
+                GroupCentre.Add(tempC);
+                Index++;
+
+            }
+            else
+            {
+                for (int j = 0; j < GroupCentre.Count; j++)
+                {
+                    float dist = GetDistantance(rInt, rYnt, GroupCentre[j].x, GroupCentre[j].y);
+                    if (dist >= 10)
+                    {
+                        GroupCentre.Add(tempC);
+                        Index++;
+                        j = 1000;
+                    }
 
 
+                }
+            }
 
+        }
+
+        Index = 0;
+
+        for (int j = 0; j < GroupCentre.Count; j++)
+        {
+
+            if (Index >= Alive_Entities_Prefabs.Count)
+                Index = Random.Range(0, Alive_Entities_Prefabs.Count - 1);
+
+            bool Placed = false;
+            int checker = 0;
+            int Spawned = 0;
+
+            while (Placed == false )
+            {
+
+                if (checker > 1000)
+                    Placed = true;
+
+
+                //bottom left is centre point for spawn group
+                int rInt = Random.Range(GroupCentre[j].x, GroupCentre[j].x + 10);
+                int rYnt = Random.Range(GroupCentre[j].y, GroupCentre[j].y + 10);
+
+                Coords tempCD = new Coords(rInt, rYnt);
+
+                checker++;
                 if (Colour_Map[rInt * 200 + rYnt] != Biome2)
                 {
 
                     //Spawn vegtable if passed checks
-
-                    Coords tempC = new Coords(rInt, rYnt);
 
                     for (int k = 0; k < genevalues.Length; k++)
                     {
                         genevalues[k] = Random.Range(0, 255);
                     }
 
-                    spawnAnimalAt(tempC, genevalues, i);
-
-                    
-                    TemporyAmount++;
+                    spawnAnimalAt(tempCD, genevalues, Index, j);
+                    Spawned++;
+                    if (Spawned >= amount)
+                        Placed = true;
 
                 }
-
-
             }
-        }
 
-    }
+            
+        }
+    
+        }
 
 
 
@@ -445,7 +501,7 @@ public class EntityTracker : MonoBehaviour
 
 
     //PathFinding
-
+    
     public Vector2 GetGrid(Vector3 Pos)
     {
         Vector2 Grid;
@@ -460,6 +516,11 @@ public class EntityTracker : MonoBehaviour
     public List<Vector3> FindPath(int xEnd, int yEnd, int xSt, int ySt)
     {
         //Debug.Log("PATH");
+        if (xEnd < 0 || xEnd > 199 || yEnd < 0 || yEnd > 199)
+            return null;
+
+        if (MapIndex[xEnd, yEnd].IsWalkable == false)
+            return null;
         Coords StarCoord = MapIndex[xSt, ySt];
         Coords EndCoord = MapIndex[xEnd, yEnd];
         //  List<Coords> FinalPath;

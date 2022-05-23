@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 2997139953420067964}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 10.601139, y: -1.4954681, z: 26.223448}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -103,10 +103,11 @@ MonoBehaviour:
   food: 10
   HP: 10
   movespeed: 3
-  range: 4
+  range: 8
   Tarx: 0
   tary: 0
   Hunger: 0
   Thirst: 0
   decompose: 0
+  horny: 0
   CurrentAction: 0

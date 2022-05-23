@@ -16,8 +16,10 @@ public class Animal : Alive_entity
     float eatSpeed = 11;
     public float movespeed = 20;
 
-    //Genes
 
+    
+    //Genes
+    bool herbivore = true;
     Color Matcolour;
     public int range;
     int repoduction;
@@ -36,21 +38,23 @@ public class Animal : Alive_entity
     int pathindex;
     public int Tarx;
     public int tary;
+    float CriticalThirstHunger = 0.9f;
 
     //Death
-    float MaxHunger = 200;
+    float MaxHunger = 45;
     float MaxThirst = 190;
     float TimetoDecompose = 90;
 
     //Other Entities
     List<Alive_entity> Predators;
     Alive_entity eating;
-    Vegtable Fruit_target;
+    Vegtable Vegtable_target;
 
     //STATUS
     public float Hunger;
     public float Thirst;
     public float decompose;
+    public float horny;
 
     //Water
     public Coords WaterAdj;
@@ -61,10 +65,10 @@ public class Animal : Alive_entity
 
 
  
-    public void init(int[] GeneValues, Coords Position)
+    public void init(int[] GeneValues, Coords Position, Coords HomeCoord)
     {
 
-
+        
         //value setups
         Vector3 pos = EntityTracker.Instance.Coordtoworld(Position);
         transform.position = pos;
@@ -111,155 +115,41 @@ public class Animal : Alive_entity
         //Check if dead
         if (dead == true)
         {
-            decompose += Time.deltaTime * 1 / TimetoDecompose;
+            Decompose();
 
-            if (decompose >= 1)
-            {
-                Die(Death.decompose);
-            }
         }
 
         else {
+
+            //Update time
+
             Thirst += Time.deltaTime * 1 / MaxThirst;
-            Hunger += Time.deltaTime * 1 / MaxHunger;
-
-            if (Input.GetKeyDown("down"))
-        {
-                // init();
-               
-  
-            }
-
-            if (Input.GetKeyDown("up"))
-            {
-            
-
-            }
-
-
+            Hunger += Time.deltaTime * 1 / (MaxHunger - movespeed / 2); // faster == hungier quicker
             float TimeSinceLastAction = Time.time - LastActionTime;
 
-        if (TimeSinceLastAction > TimeBetweenACtions)
+            
+
+            if (TimeSinceLastAction > TimeBetweenACtions)
         {
-
-                //default behaviour is called exlporing
-                //occurs when no predators, not hungry nor firsty
-
-                //First thing Check thirst if above 0.5 get water
-                //unless there is a predator
-                //if above 0.8 get water no matter what
-
-                //Same with food
-
+               
+               // Debug.Log(TimeBetweenACtions);
                 checkforPredators();
 
-                if (Thirst > 0.5 && CurrentAction != Actions.GoingToWater && CurrentAction != Actions.Drinking)
-                {
+                ChooseAction();
 
-                    WaterAdj = EntityTracker.Instance.FindWater(x, y, 10);
-                    if (WaterAdj.x != -1)
-                    {
-                        CurrentAction = Actions.GoingToWater;
-                        Tarx = WaterAdj.x;
-                        tary = WaterAdj.y;
-                        PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y);
+                DoActions();
+                
 
-
-                    }
-                   
-                    //action
-
-                    
-                }
-
-            LastActionTime = Time.time;
+                LastActionTime = Time.time;
                 //choost action
 
-                
-
-                
-                
-
         }
-            if (CurrentAction == Actions.GoingToWater && x == WaterAdj.x && y == WaterAdj.y)
-            {
-                CurrentAction = Actions.Drinking;
-
-                //drink
-
-
-
-            }
-
-
-            if (Hunger > 0.4 && CurrentAction != Actions.Goingtofood && CurrentAction != Actions.Eating)
-            {
-
-                Fruit_target = vegation_manger.Instance.FindVegatble(x, y, 10, Specie);
-                //Debug.Log(Fruit_target.xy.x);
-                if (Fruit_target.xy.x != -1)
-                {
-                    CurrentAction = Actions.Goingtofood;
-                    Tarx = Fruit_target.xy.x;
-                    tary = Fruit_target.xy.y;
-                    PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y);
-
-
-                }
-
-                //action
-
-
-            }
-
-            LastActionTime = Time.time;
-            //choost action
-
-
-
-
-
 
         
-        if (CurrentAction == Actions.Goingtofood && x == Fruit_target.xy.x && y == Fruit_target.xy.y && Fruit_target != null)
-        {
-            CurrentAction = Actions.Eating;
-
-            //drink
-
-
-
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         UpdateStatus();
     
-            if (Hunger >= 1)
-            {
-                Die(Death.Hunger);
-            }
-            else if (Thirst >= 1)
-            {
-                Die(Death.Thirst);
-            }
+            
 
 
 
@@ -268,12 +158,215 @@ public class Animal : Alive_entity
         }
     }
 
+    private void ChooseAction()
+    {
+        //IF TIRED == 1 INSTANTLY REST
+
+
+        //Drink water
+        if (CurrentAction == Actions.GoingToWater && x == WaterAdj.x && y == WaterAdj.y)
+        {
+            CurrentAction = Actions.Drinking;
+            return;
+        }
+
+
+        if (Thirst > 0.5 && CurrentAction != Actions.GoingToWater && CurrentAction != Actions.Drinking)
+        {
+            if (!findwater())
+                CurrentAction = Actions.Exploring;
+            return;
+        }
 
 
 
+        if (Hunger >= 0.4)
+        {
+            bool temp = false;
+
+            if (herbivore)
+                temp = foodHerbivore();
+            else
+                temp = foodMeat();
+
+            if (temp)
+                return;
+
+            CurrentAction = Actions.Exploring;
+            return;
+
+        }
+
+        
+
+        if (horny > 0.8)
+        {
+            //do thing
+        }
+
+        if (CurrentAction != Actions.Eating && CurrentAction != Actions.Drinking)
+            CurrentAction = Actions.Exploring;
 
 
+    }
 
+
+    public void goToRandomDirection()
+    {
+
+        if (PathList == null)
+        {
+
+            int lol = Random.Range(1, 5);
+            int rInt = Random.Range(1, 3);
+            int rYnt = Random.Range(1, 3);
+
+            //OPTIMIZE THIS LATER BY CREATING NEW PATHLIST CREATOR FOR MOVING SLIGHTLY
+
+            switch (lol)
+            {
+
+                case 1:
+                    SetTargetLocation(x + rInt, y + rYnt);
+                    break;
+                case 2:
+                    SetTargetLocation(x - rInt, y + rYnt);
+                    break;
+                case 3:
+                    SetTargetLocation(x + rInt, y - rYnt);
+                    break;
+                case 4:
+                    SetTargetLocation(x - rInt, y - rYnt);
+                    break;
+                default:
+                    SetTargetLocation(x + rInt, y + rYnt);
+                    break;
+            }
+            
+
+            
+            /*
+            if (Random.Range(1, 2) == 2 && x +rInt !> 199 && y + rYnt)
+            {
+                SetTargetLocation(x + rInt, y + rYnt);
+            }
+            else
+                SetTargetLocation(x - rInt, y - rYnt);
+            */
+
+
+        }
+        //MIGHT HAVE TO LIMIT IT
+        
+    }
+
+    bool findwater()
+    {
+        WaterAdj = EntityTracker.Instance.FindWater(x, y, range);
+        if (WaterAdj.x != -1)
+        {
+            CurrentAction = Actions.GoingToWater;
+            return true;
+        }
+        return false;
+    }
+
+    private bool FindVegtable()
+    {
+        Vegtable_target = vegation_manger.Instance.FindVegatble(x, y, range, Specie);
+        if (Vegtable_target.xy.x != -1)
+        {
+            CurrentAction = Actions.Goingtofood;
+            return true;
+        }
+        
+        return false;
+    }
+
+    bool FindFood()
+    {
+
+        return false;
+    }
+
+
+    private bool foodHerbivore()
+    {
+        if (CurrentAction == Actions.Goingtofood && x == Vegtable_target.xy.x && y == Vegtable_target.xy.y && Vegtable_target != null)
+        {
+            CurrentAction = Actions.Eating;
+            return true;
+        }
+
+
+        if ( CurrentAction != Actions.Goingtofood)
+        {
+            if (FindVegtable())
+                return true;
+        }
+
+
+        return false;
+    }
+    private bool foodMeat()
+    {
+        return true;
+    }
+    
+
+
+    private void DoActions()
+    {
+
+        
+        switch (CurrentAction)
+        {
+            case Actions.Exploring:
+                goToRandomDirection();
+                break;
+
+            case Actions.Goingtofood:
+                if(herbivore)
+                    SetTargetLocation(Vegtable_target.xy.x, Vegtable_target.xy.y);
+                else//food
+                    SetTargetLocation(Vegtable_target.xy.x, Vegtable_target.xy.y);//Change
+                break;
+
+            case Actions.GoingToWater:
+                SetTargetLocation(WaterAdj.x, WaterAdj.y);
+                break;
+
+            case Actions.escaping:
+
+                break;
+
+            case Actions.chasing:
+
+                break;
+
+
+        }
+    }
+
+    void Decompose()
+    {
+
+        decompose += Time.deltaTime * 1 / TimetoDecompose;
+
+        if (decompose >= 1)
+        {
+            Die(Death.decompose);
+        }
+    }
+
+
+    void SetTargetLocation(int Lx, int Ly)
+    {
+        Tarx = Lx;
+        tary = Ly;
+        PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y);
+        
+    }
 
 
 
@@ -301,27 +394,49 @@ public class Animal : Alive_entity
 
     }
 
-    void UpdateStatus() { 
-    
-    if (CurrentAction == Actions.Drinking)
+    void UpdateStatus() {
+
+        if (Hunger >= 1)
         {
-            if (Thirst > 0)
+            Die(Death.Hunger);
+        }
+        else if (Thirst >= 1)
+        {
+            Die(Death.Thirst);
+        }
+
+
+
+
+        if (CurrentAction == Actions.Drinking)
+        {
+            if (Thirst > 0.05)
             {
                 Thirst -= Time.deltaTime * 1 / drinkSpeed;
                 Thirst = Mathf.Clamp01(Thirst);
 
             }
+            else
+                CurrentAction = Actions.Exploring;
         } 
 
-    else  if (CurrentAction == Actions.Eating && Fruit_target != null)
+    else  if (CurrentAction == Actions.Eating && Vegtable_target != null)
         {
 
-            if (Hunger > 0)
+            if (Hunger > 0.05)
             {
-                Hunger -= Time.deltaTime * 1 / drinkSpeed;
-                Hunger = Mathf.Clamp01(Thirst);
-                Fruit_target.eaten();
+
+
+                Hunger -= Time.deltaTime * 1 / eatSpeed;
+                Hunger = Mathf.Clamp01(Hunger);
+
+
+            }
+            else
+            {
                 CurrentAction = Actions.Exploring;
+                Vegtable_target.eaten();
+                Debug.Log("eaten");
             }
         }
     
@@ -381,6 +496,7 @@ public class Animal : Alive_entity
 
             x = (int)Temp.x;
             y = (int)Temp.y;
+
             Coordinate.x = x;
             Coordinate.y = y;
             CurrentPos = x + y;

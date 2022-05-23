@@ -1,8 +1,7 @@
 public enum Actions
 {
-    None,
-    Resting,
     Exploring,
+    Resting,
     Goingtofood,
     GoingToWater,
     Eating,
