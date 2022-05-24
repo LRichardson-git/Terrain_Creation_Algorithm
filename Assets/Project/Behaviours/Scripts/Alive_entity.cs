@@ -21,8 +21,11 @@ public class Alive_entity : MonoBehaviour
     public int food = 10;
     protected bool dead = false;
     public int HP = 10;
+    public void beingeaten()
+    {
 
-   
+    }
+
     public  void Die(Death cause)
     {
         if (cause == Death.decompose || food <= 0)
@@ -37,4 +40,13 @@ public class Alive_entity : MonoBehaviour
         dead = true;
         Reason = cause;  }
 
+   public void eaten()
+    {
+
+        EntityTracker.Instance.RemoveEntity(Specie, this);
+        Destroy(gameObject);
     }
+
+    }
+
+

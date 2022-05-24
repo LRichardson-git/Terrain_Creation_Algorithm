@@ -20,6 +20,7 @@ public class EntityTracker : MonoBehaviour
     public static bool[,] walkable;
     private const int m_Move_Straight_Cost = 10;
     private const int m_Move_Diagonal_cost = 14;
+    private int Debugg;
     public Coords[,] MapIndex;
 
     //water
@@ -37,6 +38,8 @@ public class EntityTracker : MonoBehaviour
     public List<Animal> Alive_Entities_Prefabs;
     List<Species> SpeciesTypeList;
     Vector3 TempLoc;
+
+    
 
 
 
@@ -61,14 +64,17 @@ public class EntityTracker : MonoBehaviour
     }
 
 
-    public List<Alive_entity> CheckPredators(int x, int y, int Range, Species Specis)
+    public Alive_entity CheckPredators(int x, int y, int Range, Species Specis)
     {
 
-        List<Alive_entity> PredatList = new List<Alive_entity>();
+        Alive_entity Predat = null;
 
-       // Debug.Log(Specis);
+        // Debug.Log(Specis);
+
+        float maxdist = Range;
 
         List<Species> PredatorSpeciesList = PredatorSpecies[Specis];
+
         for (int i = 0; i < PredatorSpeciesList.Count; i++)
         {
 
@@ -77,23 +83,62 @@ public class EntityTracker : MonoBehaviour
 
             for (int j = 0; j < PredSpecieL.Count; j++)
             {
-                Debug.Log(j);
+                
                 float distant = GetDistantance(x, y, PredSpecieL[j].x, PredSpecieL[j].y);
 
 
                 //add check for if prey to another predator
-                if (distant < Range && distant > 0)
+                if (distant < maxdist )
                 {
-                    PredatList.Add(PredSpecieL[j]);
+                    Predat =  PredSpecieL[j];
+                    maxdist = distant;
                 }
             }
         }
         
-        return PredatList;
+
+        return Predat;
 
 
     }
 
+
+    public Alive_entity CheckPray(int x, int y, int Range, Species Specis)
+    {
+
+        Alive_entity Predat = null;
+
+        // Debug.Log(Specis);
+
+        float maxdist = Range;
+
+        List<Species> PreyspecisList = PreySpecies[Specis];
+        
+        for (int i = 0; i < PreyspecisList.Count; i++)
+        {
+
+
+            List<Alive_entity> PredSpecieL = SpeciesMap[PreyspecisList[i]];
+            for (int j = 0; j < PredSpecieL.Count; j++)
+            {
+
+                float distant = GetDistantance(x, y, PredSpecieL[j].x, PredSpecieL[j].y);
+
+
+                //add check for if prey to another predator
+                if (distant < maxdist)
+                {
+                    Predat = PredSpecieL[j];
+                    maxdist = distant;
+                }
+            }
+        }
+
+
+        return Predat;
+
+
+    }
 
     public virtual void Init(Color[] Map_Colour, Color Biome2, int width, float[,] Noise)
     {
@@ -109,6 +154,8 @@ public class EntityTracker : MonoBehaviour
         SpeciesTypeList = new List<Species>();
         SpeciesTypeList.Add(Species.Rabbit);
         SpeciesTypeList.Add(Species.fox);
+
+        Debugg = 85;
         //lopp through water
         for (int x = 0; x < width; x++)
         {
@@ -198,14 +245,17 @@ public class EntityTracker : MonoBehaviour
 
 
         PreySpecies = new Dictionary<Species, List<Species>>();
+        PreySpecies.Add(Species.fox, new List<Species>());
+        PreySpecies[(Species.fox)].Add(Species.Rabbit);
 
 
         //for now hardcode until otherwise
         PredatorSpecies = new Dictionary<Species, List<Species>>();
         PredatorSpecies.Add(Species.Rabbit, new List<Species>());
         PredatorSpecies[(Species.Rabbit)].Add(Species.fox);
+        PredatorSpecies.Add(Species.fox, new List<Species>());
 
-        SpawnInitalAnimals(1, Biome2, 1);
+        SpawnInitalAnimals(1, Biome2, 2);
         Debug.Log("inition done");
       
     }
@@ -217,14 +267,14 @@ public class EntityTracker : MonoBehaviour
     public void spawnAnimalAt(Coords Spawn, int[]GeneValues, int specie, int index)
     {
         Spawn.x = 30;
-        Spawn.y = 85;
+        Spawn.y = Debugg;
         TempLoc = EntityTracker.Instance.Coordtoworld(Spawn);
         
         Animal NewEntity = Instantiate(Alive_Entities_Prefabs[specie], TempLoc, Quaternion.identity);
         NewEntity.init(GeneValues, Spawn, GroupCentre[index]);
         SpeciesMap[(SpeciesTypeList[specie])].Add(NewEntity);
 
-
+        Debugg += 2;
         //add to dictariony and location list
 
 
@@ -277,7 +327,7 @@ public class EntityTracker : MonoBehaviour
 
         for (int j = 0; j < GroupCentre.Count; j++)
         {
-
+            
             if (Index >= Alive_Entities_Prefabs.Count)
                 Index = Random.Range(0, Alive_Entities_Prefabs.Count - 1);
 
@@ -316,7 +366,7 @@ public class EntityTracker : MonoBehaviour
 
                 }
             }
-
+            Index++;
             
         }
     
@@ -521,6 +571,8 @@ public class EntityTracker : MonoBehaviour
 
         if (MapIndex[xEnd, yEnd].IsWalkable == false)
             return null;
+
+
         Coords StarCoord = MapIndex[xSt, ySt];
         Coords EndCoord = MapIndex[xEnd, yEnd];
         //  List<Coords> FinalPath;

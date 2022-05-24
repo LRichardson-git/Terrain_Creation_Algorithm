@@ -9,7 +9,7 @@ public class Animal : Alive_entity
     //General
     float LastActionTime;
     float TimeBetweenACtions = 4;
-    
+    float tired;
 
     //speeds
     float drinkSpeed = 7;
@@ -19,7 +19,7 @@ public class Animal : Alive_entity
 
     
     //Genes
-    bool herbivore = true;
+    public bool herbivore = true;
     Color Matcolour;
     public int range;
     int repoduction;
@@ -39,6 +39,7 @@ public class Animal : Alive_entity
     public int Tarx;
     public int tary;
     float CriticalThirstHunger = 0.9f;
+    public int speed = 4;
 
     //Death
     float MaxHunger = 45;
@@ -46,7 +47,7 @@ public class Animal : Alive_entity
     float TimetoDecompose = 90;
 
     //Other Entities
-    List<Alive_entity> Predators;
+    Alive_entity Predator;
     Alive_entity eating;
     Vegtable Vegtable_target;
 
@@ -55,11 +56,11 @@ public class Animal : Alive_entity
     public float Thirst;
     public float decompose;
     public float horny;
-
+    public Species Ani;
     //Water
     public Coords WaterAdj;
     Coords waterDrink;
-
+    bool chasing;
     //Enum
     public Actions CurrentAction;
 
@@ -80,7 +81,26 @@ public class Animal : Alive_entity
 
 
         //Gene setup
-        movespeed +=  geneValues[0] * 0.2f ;
+
+        if (!herbivore)
+            TimeBetweenACtions = 3;
+
+
+        if (herbivore)
+        {
+            speed += geneValues[0] / 31;
+
+
+            movespeed = speed / 4;
+        }
+        else
+        {
+            speed += geneValues[0] / 31;
+
+
+            movespeed = speed / 3;
+        }
+        movespeed = movespeed * 10;
         if (geneValues[1] > 225) // randomize colour if this gene passes test
         {
             for (int i = 0; i < 4; i++)
@@ -91,7 +111,7 @@ public class Animal : Alive_entity
         }
 
 
-        range = geneValues[2] / 25 ;
+        range = geneValues[2] / 25 + 3 ;
         repoduction = geneValues[3];
         desirabilty = geneValues[4];
         gestation = geneValues[5];
@@ -103,6 +123,7 @@ public class Animal : Alive_entity
         //hungerir and thirstier faster if quicker
         MaxHunger -= ((movespeed / 2) + (movespeed / 5));
         MaxThirst -= ((movespeed / 2) + (movespeed / 3));
+        Specie = Ani;
 
     }
 
@@ -133,7 +154,7 @@ public class Animal : Alive_entity
         {
                
                // Debug.Log(TimeBetweenACtions);
-                checkforPredators();
+                
 
                 ChooseAction();
 
@@ -149,11 +170,7 @@ public class Animal : Alive_entity
 
         UpdateStatus();
     
-            
-
-
-
-            FindPath();
+        FindPath();
         
         }
     }
@@ -163,6 +180,18 @@ public class Animal : Alive_entity
         //IF TIRED == 1 INSTANTLY REST
 
 
+        if (checkforPredators() && Thirst < CriticalThirstHunger && Hunger < CriticalThirstHunger)
+        {
+            chasing = false;
+            return;
+            
+        }
+
+        if (CurrentAction == Actions.Eating || CurrentAction == Actions.Drinking || CurrentAction == Actions.GoingToWater)
+            return;
+
+
+        chasing = false;
         //Drink water
         if (CurrentAction == Actions.GoingToWater && x == WaterAdj.x && y == WaterAdj.y)
         {
@@ -180,7 +209,7 @@ public class Animal : Alive_entity
 
 
 
-        if (Hunger >= 0.4)
+        if (Hunger >= 0.4 && CurrentAction != Actions.Goingtofood && CurrentAction != Actions.Eating && CurrentAction != Actions.Drinking)
         {
             bool temp = false;
 
@@ -192,20 +221,20 @@ public class Animal : Alive_entity
             if (temp)
                 return;
 
-            CurrentAction = Actions.Exploring;
-            return;
+            
+            
 
         }
+        else
+            CurrentAction = Actions.Exploring;
 
-        
 
         if (horny > 0.8)
         {
             //do thing
         }
 
-        if (CurrentAction != Actions.Eating && CurrentAction != Actions.Drinking)
-            CurrentAction = Actions.Exploring;
+       
 
 
     }
@@ -218,8 +247,8 @@ public class Animal : Alive_entity
         {
 
             int lol = Random.Range(1, 5);
-            int rInt = Random.Range(1, 3);
-            int rYnt = Random.Range(1, 3);
+            int rInt = Random.Range(1, speed + 1);
+            int rYnt = Random.Range(1, speed + 1);
 
             //OPTIMIZE THIS LATER BY CREATING NEW PATHLIST CREATOR FOR MOVING SLIGHTLY
 
@@ -310,9 +339,35 @@ public class Animal : Alive_entity
     }
     private bool foodMeat()
     {
-        return true;
+
+  
+        if (CurrentAction != Actions.Goingtofood)
+        {
+
+            if (findMeat())
+            {
+                return true;
+            }
+        }
+        return false;
+
     }
+
+   
     
+    bool findMeat()
+    {
+        eating = EntityTracker.Instance.CheckPray(x, y, range, Specie);
+        if (eating != null)
+        {
+            CurrentAction = Actions.Goingtofood;
+            chasing = true;
+            return true;
+        }
+
+        return false;
+
+    }
 
 
     private void DoActions()
@@ -326,10 +381,9 @@ public class Animal : Alive_entity
                 break;
 
             case Actions.Goingtofood:
-                if(herbivore)
+                if (herbivore)
                     SetTargetLocation(Vegtable_target.xy.x, Vegtable_target.xy.y);
-                else//food
-                    SetTargetLocation(Vegtable_target.xy.x, Vegtable_target.xy.y);//Change
+                
                 break;
 
             case Actions.GoingToWater:
@@ -337,7 +391,7 @@ public class Animal : Alive_entity
                 break;
 
             case Actions.escaping:
-
+                SetTargetLocation(Tarx, tary);
                 break;
 
             case Actions.chasing:
@@ -364,6 +418,7 @@ public class Animal : Alive_entity
     {
         Tarx = Lx;
         tary = Ly;
+
         PathList = EntityTracker.Instance.FindPath(Tarx, tary, x, y);
         
     }
@@ -371,27 +426,44 @@ public class Animal : Alive_entity
 
 
 
-    void checkforPredators()
+    bool checkforPredators()
     {
 
         
             // AnimialNum = 4;
 
-            Predators = new List<Alive_entity>(EntityTracker.Instance.CheckPredators(x, y, range, Specie));
-            if (Predators.Count > 0)
+            Predator = EntityTracker.Instance.CheckPredators(x, y, range, Specie);
+            if (Predator != null)
             {
-                //run away
+            //run away
+            CurrentAction = Actions.escaping;
 
-                Debug.Log(Predators[0].x);
-                Debug.Log(Predators[0].y);
+
+            //round movespeed to 10s 30 movespeed == top
+
+            Tarx = x;
+            tary = y;
+
+            if (Predator.x > x)
+                Tarx -= speed;
+            else if (Predator.x < x)
+                Tarx += speed;
+
+            if (Predator.y > y)
+                tary -= speed;
+            else if (Predator.y < y)
+                tary += speed;
+
+            return true;
             }
             else
             {
-                // Debug.Log("no pred");
+            // Debug.Log("no pred");
+            return false;
             }
 
         
-
+            
     }
 
     void UpdateStatus() {
@@ -420,7 +492,7 @@ public class Animal : Alive_entity
                 CurrentAction = Actions.Exploring;
         } 
 
-    else  if (CurrentAction == Actions.Eating && Vegtable_target != null)
+    else  if (CurrentAction == Actions.Eating)
         {
 
             if (Hunger > 0.05)
@@ -435,13 +507,26 @@ public class Animal : Alive_entity
             else
             {
                 CurrentAction = Actions.Exploring;
-                Vegtable_target.eaten();
-                Debug.Log("eaten");
+
+                if (herbivore)
+                    Vegtable_target.eaten();
+                else
+                    eating.eaten();
+                
             }
         }
     
     
-    
+    if (chasing)
+        {
+            if (EntityTracker.Instance.GetDistantance(x, y, eating.x, eating.y) < 2.5) {
+                CurrentAction = Actions.Eating;
+                eating.Die(Death.Killed);
+                chasing = false;
+            }
+            
+                //SetTargetLocation(eating.x, eating.y);
+        }
     
     
     }
