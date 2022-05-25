@@ -103,11 +103,15 @@ MonoBehaviour:
   food: 10
   HP: 10
   movespeed: 3
-  range: 8
+  herbivore: 1
+  range: 25
   Tarx: 0
   tary: 0
+  speed: 4
   Hunger: 0
   Thirst: 0
   decompose: 0
   horny: 0
+  Ani: 0
+  chasing: 0
   CurrentAction: 0

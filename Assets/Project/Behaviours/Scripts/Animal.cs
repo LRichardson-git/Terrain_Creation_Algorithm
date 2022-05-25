@@ -8,7 +8,7 @@ public class Animal : Alive_entity
 
     //General
     float LastActionTime;
-    float TimeBetweenACtions = 4;
+    float TimeBetweenACtions = 2;
     float tired;
 
     //speeds
@@ -60,7 +60,6 @@ public class Animal : Alive_entity
     //Water
     public Coords WaterAdj;
     Coords waterDrink;
-    bool chasing;
     //Enum
     public Actions CurrentAction;
 
@@ -82,8 +81,8 @@ public class Animal : Alive_entity
 
         //Gene setup
 
-        if (!herbivore)
-            TimeBetweenACtions = 3;
+       // if (!herbivore)
+            //TimeBetweenACtions = 3;
 
 
         if (herbivore)
@@ -91,15 +90,15 @@ public class Animal : Alive_entity
             speed += geneValues[0] / 31;
 
 
-            movespeed = speed / 4;
+            movespeed = speed / 2;
         }
-        else
-        {
-            speed += geneValues[0] / 31;
+       // else
+       // {
+         //   speed += geneValues[0] / 31;
 
 
-            movespeed = speed / 3;
-        }
+         //   movespeed = speed / 3;
+     //   }
         movespeed = movespeed * 10;
         if (geneValues[1] > 225) // randomize colour if this gene passes test
         {
@@ -125,6 +124,12 @@ public class Animal : Alive_entity
         MaxThirst -= ((movespeed / 2) + (movespeed / 3));
         Specie = Ani;
 
+
+        if (Specie == Species.fox)
+        {
+            Hunger = 0.39f;
+            range = 50;
+        }
     }
 
 
@@ -166,7 +171,11 @@ public class Animal : Alive_entity
 
         }
 
-        
+
+          //  Debug.Log("================");
+          //  Debug.Log(pathindex);
+          //  Debug.Log(Specie);
+          //  Debug.Log(PathList);
 
         UpdateStatus();
     
@@ -182,16 +191,20 @@ public class Animal : Alive_entity
 
         if (checkforPredators() && Thirst < CriticalThirstHunger && Hunger < CriticalThirstHunger)
         {
-            chasing = false;
             return;
             
         }
 
-        if (CurrentAction == Actions.Eating || CurrentAction == Actions.Drinking || CurrentAction == Actions.GoingToWater)
+        if (CurrentAction == Actions.chasing && EntityTracker.Instance.GetDistantance(x, y, eating.x, eating.y) <= range)
             return;
 
 
-        chasing = false;
+
+
+        if (CurrentAction == Actions.Eating || CurrentAction == Actions.Drinking || CurrentAction == Actions.GoingToWater || CurrentAction == Actions.Goingtofood)
+            return;
+
+
         //Drink water
         if (CurrentAction == Actions.GoingToWater && x == WaterAdj.x && y == WaterAdj.y)
         {
@@ -225,8 +238,9 @@ public class Animal : Alive_entity
             
 
         }
-        else
-            CurrentAction = Actions.Exploring;
+
+
+        CurrentAction = Actions.Exploring;
 
 
         if (horny > 0.8)
@@ -360,8 +374,7 @@ public class Animal : Alive_entity
         eating = EntityTracker.Instance.CheckPray(x, y, range, Specie);
         if (eating != null)
         {
-            CurrentAction = Actions.Goingtofood;
-            chasing = true;
+            CurrentAction = Actions.chasing;
             return true;
         }
 
@@ -391,6 +404,7 @@ public class Animal : Alive_entity
                 break;
 
             case Actions.escaping:
+                
                 SetTargetLocation(Tarx, tary);
                 break;
 
@@ -517,15 +531,23 @@ public class Animal : Alive_entity
         }
     
     
-    if (chasing)
+    if (CurrentAction == Actions.chasing) // maybe just put this in going to food???
         {
-            if (EntityTracker.Instance.GetDistantance(x, y, eating.x, eating.y) < 2.5) {
+            
+            if (EntityTracker.Instance.GetDistantance(x, y, eating.x, eating.y) < 1.5) {
                 CurrentAction = Actions.Eating;
                 eating.Die(Death.Killed);
-                chasing = false;
+                
+            }
+
+            else  
+            {
+                //Debug.Log("newPath");
+                SetTargetLocation(eating.x, eating.y);
+
             }
             
-                //SetTargetLocation(eating.x, eating.y);
+                //
         }
     
     

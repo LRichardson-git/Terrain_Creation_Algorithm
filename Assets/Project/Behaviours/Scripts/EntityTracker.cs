@@ -274,7 +274,7 @@ public class EntityTracker : MonoBehaviour
         NewEntity.init(GeneValues, Spawn, GroupCentre[index]);
         SpeciesMap[(SpeciesTypeList[specie])].Add(NewEntity);
 
-        Debugg += 2;
+        Debugg -= 10;
         //add to dictariony and location list
 
 

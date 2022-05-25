@@ -12,7 +12,8 @@ public class vegation_manger : MonoBehaviour
     public Vegtable Vegation_Prefab;
 
 
-
+    int width =200;
+    int height  =200;
     //Dictaronrys for vegtbales
     Dictionary<Species, List<Vegetion>> Eatablevegatblesbyspecies;
     Dictionary<Vegetion, List<Vegtable>> ListofVegtables;
@@ -42,12 +43,12 @@ public class vegation_manger : MonoBehaviour
     public List<Vegetion> Winter;
     
     //Data for spawning vegtables, and real time updates
-    public int SpawnAmount = 30;
+    public int SpawnAmount = 10;
     float LastWeek;
     float TimeBetweenWeeks = 30;
     float week = 0;
-
-
+    List<Coords> GroupCentre;
+    int Index = 0;
     void Start()
     {
         Instance = this;
@@ -116,7 +117,7 @@ public class vegation_manger : MonoBehaviour
 
 
         //Create initial vegtables
-        NewSeasonVegtables(currentSeason);
+        NewSeasonVegtables(currentSeason, 2);
 
 
     }
@@ -153,7 +154,7 @@ public class vegation_manger : MonoBehaviour
                     currentSeason++;
 
                 week = 0;
-                NewSeasonVegtables(currentSeason);
+                NewSeasonVegtables(currentSeason, 2);
 
 
             }
@@ -165,41 +166,46 @@ public class vegation_manger : MonoBehaviour
 
 
 
-    public void NewSeasonVegtables(Season Type)
+    public void NewSeasonVegtables(Season Type, int groups)
     {
+        
+        GroupCentre = new List<Coords>();
 
-
+        int Amount;
+        Debug.Log(SpawnAmount);
         switch (Type)
         {
             case Season.Summer:
                 
                 for (int i = 0; i < Summer.Count; i++) {
-                    SpawnAmount = Random.Range(SpawnAmount - 10, SpawnAmount);
-                    SpawnVegtablesoftype(SpawnAmount, Summer[i]);
+                   Amount = Random.Range(SpawnAmount - 10, SpawnAmount);
+                    Debug.Log(SpawnAmount);
+                    SpawnVegtablesoftype(Amount, Summer[i], groups);
+                    
                     }
                 break;
 
             case Season.fall:
 
-                for (int i = 0; i < Fall.Count; i++) { 
-                SpawnAmount = Random.Range(SpawnAmount - 12, SpawnAmount - 5);
-                SpawnVegtablesoftype(SpawnAmount, Fall[i]);
+                for (int i = 0; i < Fall.Count; i++) {
+                    Amount = Random.Range(SpawnAmount - 12, SpawnAmount - 5);
+                SpawnVegtablesoftype(Amount, Fall[i], groups);
                 }
                 break;
 
             case Season.autum:
 
                 for (int i = 0; i < Augest.Count; i++) {
-                    SpawnAmount = Random.Range(SpawnAmount - 15, SpawnAmount - 6);
-                    SpawnVegtablesoftype(SpawnAmount, Augest[i]);
+                    Amount = Random.Range(SpawnAmount - 15, SpawnAmount - 6);
+                    SpawnVegtablesoftype(Amount, Augest[i], groups);
                 }
                 break;
 
             case Season.winter:
 
-                SpawnAmount = Random.Range(1, 10);
+                Amount = Random.Range(1, 10);
                 for (int i = 0; i < Winter.Count; i++)
-                    SpawnVegtablesoftype(SpawnAmount, Winter[i]);
+                    SpawnVegtablesoftype(Amount, Winter[i], groups);
                 break;
 
         }
@@ -212,53 +218,108 @@ public class vegation_manger : MonoBehaviour
 
 
 
-    public void SpawnVegtablesoftype(int amount, Vegetion type)
+    public void SpawnVegtablesoftype(int amount, Vegetion type, int groups)
     {
 
 
-        int TemporyAmount = 0;
-        while (TemporyAmount < amount)
+        Debug.Log(type);
+
+        int GroupINdex = 0;
+        
+        
+        while (GroupINdex < groups)
         {
-            //chose random location
-            int rInt = Random.Range(0, 200);
-            int rYnt = Random.Range(0, 200);
 
-            if (Colour_Map[rInt * 200 + rYnt] != ColourWater && Colour_Map[rInt * 200 + rYnt] != colourRock)
+            int rInt = Random.Range(0, 190);
+            int rYnt = Random.Range(0, 190);
+
+
+            Coords tempC = new Coords(rInt, rYnt);
+
+            if (GroupCentre.Count < 1)
             {
-                for (int i = 0; i < Locations.Count; i++)
+                GroupCentre.Add(tempC);
+                GroupINdex++;
+
+            }
+            else
+            {
+                for (int j = 0; j < GroupCentre.Count; j++)
                 {
-
-                    if (rInt != Locations[i].x && rYnt != Locations[i].y)
+                    float dist = EntityTracker.Instance.GetDistantance(rInt, rYnt, GroupCentre[j].x, GroupCentre[j].y);
+                    if (dist >= 10)
                     {
-                        //Spawn vegtable if passed checks
-                        VegCord.x = rInt;
-                        VegCord.y = rYnt;
-
-                        location = EntityTracker.Instance.Coordtoworld(VegCord);
-                        location.y -= 4;
-
-                        Vegtable NewVeg = Instantiate(Vegation_Prefab, location, Quaternion.identity);
-                        NewVeg.type = type;
-                        NewVeg.xy = new Coords(rInt, rYnt);
-
-                        //add to dictariony and location list
-                        ListofVegtables[(type)].Add(NewVeg);
-                        Locations.Add(NewVeg.xy);
-                        TemporyAmount++;
-
-                        i = 50000;
-
+                        GroupCentre.Add(tempC);
+                        GroupINdex++;
+                        j = 1000;
                     }
 
 
                 }
-
             }
-
 
         }
 
+        Debug.Log("---------");
+        Debug.Log(amount);
 
+        int lol = 0;
+
+        //HONESTLY DONT CARE (BUG THAT SOME SPAWN ON TOP OF EACH OTHER)
+        while (lol < groups)
+        {
+            int TemporyAmount = 0;
+            
+            while (TemporyAmount < amount)
+            {
+                
+                //chose random location
+                int rInt = Random.Range(GroupCentre[Index].x, GroupCentre[Index].x + 10);
+                int rYnt = Random.Range(GroupCentre[Index].y, GroupCentre[Index].y + 10);
+
+                if (Colour_Map[rInt * 200 + rYnt] != ColourWater && Colour_Map[rInt * 200 + rYnt] != colourRock)
+                {
+
+                    for (int i = 0; i < Locations.Count; i++)
+                    {
+
+                        if (rInt != Locations[i].x && rYnt != Locations[i].y)
+                        {
+
+                            Debug.Log(Locations[i].x);
+                            Debug.Log(Locations[i].y);
+                            //Spawn vegtable if passed checks
+                            VegCord.x = rInt;
+                            VegCord.y = rYnt;
+
+                            location = EntityTracker.Instance.Coordtoworld(VegCord);
+                            location.y -= 4;
+
+                            Vegtable NewVeg = Instantiate(Vegation_Prefab, location, Quaternion.identity);
+                            NewVeg.type = type;
+                            NewVeg.xy = new Coords(rInt, rYnt);
+                            //Debug.Log(NewVeg.type);
+                         //   Debug.Log(type);
+
+                            //add to dictariony and location list
+                            ListofVegtables[(type)].Add(NewVeg);
+                            Locations.Add(NewVeg.xy);
+                            TemporyAmount++;
+
+                            break;
+
+                        }
+
+
+                    }
+
+                }
+
+
+            }
+            Index++;
+            lol++;
+        }
 
 
     }
@@ -325,18 +386,25 @@ public class vegation_manger : MonoBehaviour
                 {
 
 
+                   
+
                     //loop through 3x3 square around vegtable
                     for (int x = TempVegList[j].xy.x - 1; x <= TempVegList[j].xy.x + 1; x++)
                     {
                         for (int y = TempVegList[j].xy.y - 1; y <= TempVegList[j].xy.y + 1; y++)
                         {
 
-                            
-                            if (Colour_Map[x * 200 + y] != ColourWater && Colour_Map[x * 200 + y] != colourRock)
+                            if (x < 0 || x > width - 2 || y > height - 2 || y < 0)
                             {
-                               
+                                //do nothing
+                            }
+                            else
+                            {
+                                if (Colour_Map[x * 200 + y] != ColourWater && Colour_Map[x * 200 + y] != colourRock)
+                                {
 
-                                
+
+
                                     for (int l = 0; l < tempVegLocations.Count; l++)
                                     {
                                         //Debug.Log(tempVegLocations.Count);
@@ -346,12 +414,15 @@ public class vegation_manger : MonoBehaviour
 
                                             Coords possibleCoord = new Coords(x, y);
                                             PossibleSpawns.Add(possibleCoord);
-                                        break;
+                                            break;
 
 
                                         }
                                     }
+                                }
                             }
+                            
+                           
                         }
                     }
                 }
