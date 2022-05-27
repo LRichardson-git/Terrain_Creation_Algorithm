@@ -16,6 +16,9 @@ public class EntityTracker : MonoBehaviour
     Color[] Colour_Map;
     List<Coords> GroupCentre;
 
+    //debuuggin
+    public GameObject Animals;
+
     //Pathfinding
     public static bool[,] walkable;
     private const int m_Move_Straight_Cost = 10;
@@ -255,7 +258,7 @@ public class EntityTracker : MonoBehaviour
         PredatorSpecies[(Species.Rabbit)].Add(Species.fox);
         PredatorSpecies.Add(Species.fox, new List<Species>());
 
-        SpawnInitalAnimals(1, Biome2, 2);
+        SpawnInitalAnimals(10, Biome2, 20);
         Debug.Log("inition done");
       
     }
@@ -264,28 +267,15 @@ public class EntityTracker : MonoBehaviour
 
 
 
-    public void spawnAnimalAt(Coords Spawn, int[]GeneValues, int specie, int index)
-    {
-        Spawn.x = 30;
-        Spawn.y = Debugg;
-        TempLoc = EntityTracker.Instance.Coordtoworld(Spawn);
-        
-        Animal NewEntity = Instantiate(Alive_Entities_Prefabs[specie], TempLoc, Quaternion.identity);
-        NewEntity.init(GeneValues, Spawn, GroupCentre[index]);
-        SpeciesMap[(SpeciesTypeList[specie])].Add(NewEntity);
-
-        Debugg -= 10;
-        //add to dictariony and location list
 
 
-    }
 
 
     public void SpawnInitalAnimals(int amount, Color Biome2, int groups)
     {
         int[] genevalues = new int[10];
 
-
+        Color Empty = new Color() ;
         int Index = 0;
 
         //check for max size here
@@ -359,7 +349,7 @@ public class EntityTracker : MonoBehaviour
                         genevalues[k] = Random.Range(0, 255);
                     }
 
-                    spawnAnimalAt(tempCD, genevalues, Index, j);
+                    spawnAnimalAt(tempCD, genevalues, Index, j, Empty,true);
                     Spawned++;
                     if (Spawned >= amount)
                         Placed = true;
@@ -380,20 +370,102 @@ public class EntityTracker : MonoBehaviour
 
 
 
+    public void spawnAnimalAt(Coords Spawn, int[] GeneValues, int specie, int index, Color MatColor, bool Initial)
+    {
+       // Spawn.x = 30;
+     //   Spawn.y = Debugg;
+        TempLoc = EntityTracker.Instance.Coordtoworld(Spawn);
+
+        Animal NewEntity = Instantiate(Alive_Entities_Prefabs[specie], TempLoc, Quaternion.identity);
+        NewEntity.init(GeneValues, Spawn, GroupCentre[index],MatColor, Initial);
+        SpeciesMap[(SpeciesTypeList[specie])].Add(NewEntity);
+        NewEntity.transform.SetParent(Animals.transform);
+        //  Debugg -= 10;
+        //add to dictariony and location list
+
+
+    }
 
 
 
 
+    public void Spawnchild(int[]Genes, int gestation, Coords spawn, int species, Color ChildColour)
+    {
+        //Debug.Log(species);
+
+        //genes
+        int debuff = -15;
+        Genes[3] += debuff + (gestation * 2);
+        Genes[4] += debuff + gestation;
+        Genes[7] += debuff + gestation;
+            
+        for (int i = 3; i < 8; i++)
+        {
+            if (Genes[i] > 255)
+                Genes[i] = 255;
+
+            if (i == 4)
+                i = 6;
+        }
+
+        
+
+
+        //may change index since not accounts for spawn home
+        spawnAnimalAt(spawn, Genes, species, 0, ChildColour,false);
+
+    }
+
+
+    public Color Newcolour(Color c1, Color c2)
+    {
+         Color Newcolor = (c1 + c2) / 2;
+        return Newcolor;
+    }
+
+
+    public int[] breed(int[] GenesFemale, int[] GenesMale)
+    {
+        int[] NewGenes = new int[10];
+
+        for (int i = 0; i < NewGenes.Length; i++)
+        {
+            int chance = Random.Range(1, 3);
+
+            if (chance == 1)
+                NewGenes[i] = GenesMale[i];
+            else
+                NewGenes[i] = GenesFemale[i];
 
 
 
+        }
 
+        NewGenes[1] = Random.Range(1, 255);
+        NewGenes[5] = GenesFemale[5];
 
+        //might need to chance
+        return NewGenes;
+    }
 
+    public Alive_entity FindMate(Species Specie, int range, Coords Position, int desirebile)
+    {
 
+        for (int i = 0; i < SpeciesMap[Specie].Count; i++)
+        {
 
+            float Length = GetDistantance(Position.x, Position.y, SpeciesMap[Specie][i].x, SpeciesMap[Specie][i].y);
 
+            if (Length < range && SpeciesMap[Specie][i].isfemale == true)
+            {
+                if (SpeciesMap[Specie][i].requestMating(desirebile)) ;
+                    return SpeciesMap[Specie][i];
+            }
+        }
 
+        return null;
+
+    }
 
 
 

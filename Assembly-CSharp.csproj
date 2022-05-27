@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Project\Enviroment\Scripts\MapMeshGenertion.cs" />
+    <Compile Include="Assets\Project\Behaviours\Scripts\Breeding.cs" />
     <Compile Include="Assets\Project\Behaviours\Scripts\Vegtable.cs" />
     <Compile Include="Assets\Project\Behaviours\Scripts\EntityTracker.cs" />
     <Compile Include="Assets\Project\Enviroment\Scripts\Mouselook.cs" />

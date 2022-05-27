@@ -10,7 +10,7 @@ public class vegation_manger : MonoBehaviour
 
     //Prefabs
     public Vegtable Vegation_Prefab;
-
+    public GameObject Vegtables;
 
     int width =200;
     int height  =200;
@@ -117,7 +117,7 @@ public class vegation_manger : MonoBehaviour
 
 
         //Create initial vegtables
-        NewSeasonVegtables(currentSeason, 2);
+        NewSeasonVegtables(currentSeason, 6);
 
 
     }
@@ -172,14 +172,14 @@ public class vegation_manger : MonoBehaviour
         GroupCentre = new List<Coords>();
 
         int Amount;
-        Debug.Log(SpawnAmount);
+        //Debug.Log(SpawnAmount);
         switch (Type)
         {
             case Season.Summer:
                 
                 for (int i = 0; i < Summer.Count; i++) {
                    Amount = Random.Range(SpawnAmount - 10, SpawnAmount);
-                    Debug.Log(SpawnAmount);
+                
                     SpawnVegtablesoftype(Amount, Summer[i], groups);
                     
                     }
@@ -222,7 +222,7 @@ public class vegation_manger : MonoBehaviour
     {
 
 
-        Debug.Log(type);
+       
 
         int GroupINdex = 0;
         
@@ -260,8 +260,7 @@ public class vegation_manger : MonoBehaviour
 
         }
 
-        Debug.Log("---------");
-        Debug.Log(amount);
+        
 
         int lol = 0;
 
@@ -286,8 +285,7 @@ public class vegation_manger : MonoBehaviour
                         if (rInt != Locations[i].x && rYnt != Locations[i].y)
                         {
 
-                            Debug.Log(Locations[i].x);
-                            Debug.Log(Locations[i].y);
+                            
                             //Spawn vegtable if passed checks
                             VegCord.x = rInt;
                             VegCord.y = rYnt;
@@ -305,7 +303,7 @@ public class vegation_manger : MonoBehaviour
                             ListofVegtables[(type)].Add(NewVeg);
                             Locations.Add(NewVeg.xy);
                             TemporyAmount++;
-
+                            NewVeg.transform.SetParent(Vegtables.transform);
                             break;
 
                         }

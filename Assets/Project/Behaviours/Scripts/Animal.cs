@@ -10,6 +10,8 @@ public class Animal : Alive_entity
     float LastActionTime;
     float TimeBetweenACtions = 2;
     float tired;
+     float maxMatingTime = 150;
+    float maxTiredTime = 250;
 
     //speeds
     float drinkSpeed = 7;
@@ -20,16 +22,18 @@ public class Animal : Alive_entity
     
     //Genes
     public bool herbivore = true;
-    Color Matcolour;
     public int range;
     int repoduction;
     int desirabilty;
-    int gestation;
-    bool isfemale;
+    public int gestationperiod = 5;
     bool colorChange;
+    public int gestationIndex;
+    Color BabyColor;
 
-    int[] geneValues; //speed. colour. range. reproduction urge. desribilty. gestation period. is female. hunger. thirst
-
+    public int matingrange = 5;
+    int breedingtime;
+     //speed. colour. range. reproduction urge. desribilty. gestation period. is female. hunger. thirst
+    int[] BabiesGenes;
     //Pathfinding
     int previousPos;
     int CurrentPos;
@@ -42,30 +46,31 @@ public class Animal : Alive_entity
     public int speed = 4;
 
     //Death
-    float MaxHunger = 45;
+    float MaxHunger = 150;
     float MaxThirst = 190;
     float TimetoDecompose = 90;
 
     //Other Entities
     Alive_entity Predator;
-    Alive_entity eating;
+    public Alive_entity eating;
     Vegtable Vegtable_target;
 
     //STATUS
+
     public float Hunger;
     public float Thirst;
     public float decompose;
-    public float horny;
+ 
     public Species Ani;
     //Water
     public Coords WaterAdj;
     Coords waterDrink;
     //Enum
-    public Actions CurrentAction;
+    
 
 
  
-    public void init(int[] GeneValues, Coords Position, Coords HomeCoord)
+    public void init(int[] GeneValues, Coords Position, Coords HomeCoord, Color Matcolor, bool inital)
     {
 
         
@@ -78,42 +83,37 @@ public class Animal : Alive_entity
         x = Coordinate.x;
         y = Coordinate.y;
 
+        BabiesGenes = new int[10];
 
-        //Gene setup
-
-       // if (!herbivore)
-            //TimeBetweenACtions = 3;
-
-
-        if (herbivore)
-        {
+        
+        
             speed += geneValues[0] / 31;
 
 
             movespeed = speed / 2;
-        }
-       // else
-       // {
-         //   speed += geneValues[0] / 31;
+        
 
-
-         //   movespeed = speed / 3;
      //   }
         movespeed = movespeed * 10;
-        if (geneValues[1] > 225) // randomize colour if this gene passes test
+        if (geneValues[1] > 220) // randomize colour if this gene passes test
         {
-            for (int i = 0; i < 4; i++)
-            {
-                Matcolour[i] = Random.Range(0f, 1f);
 
-            }
+            GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+
+
         }
+        else if (inital != true)
+        {
+            GetComponent<Renderer>().material.color = Matcolor;
 
-
+        }
+       //etComponent<MeshRenderer>().material = Matcolour;
+        //add passed on mat colour
+        
         range = geneValues[2] / 25 + 3 ;
         repoduction = geneValues[3];
         desirabilty = geneValues[4];
-        gestation = geneValues[5];
+        gestationperiod += geneValues[5] / 10;
         if (geneValues[6] > 125)
             isfemale = true;
         MaxHunger += geneValues[7] / 2;
@@ -124,13 +124,10 @@ public class Animal : Alive_entity
         MaxThirst -= ((movespeed / 2) + (movespeed / 3));
         Specie = Ani;
 
-
-        if (Specie == Species.fox)
-        {
-            Hunger = 0.39f;
-            range = 50;
-        }
-    }
+        
+      
+        gestationIndex = gestationperiod;
+}
 
 
 
@@ -151,6 +148,8 @@ public class Animal : Alive_entity
 
             Thirst += Time.deltaTime * 1 / MaxThirst;
             Hunger += Time.deltaTime * 1 / (MaxHunger - movespeed / 2); // faster == hungier quicker
+            MatingUrge += Time.deltaTime * 1 / maxMatingTime;
+            tired += Time.deltaTime * 1 / maxTiredTime;
             float TimeSinceLastAction = Time.time - LastActionTime;
 
             
@@ -167,18 +166,31 @@ public class Animal : Alive_entity
                 
 
                 LastActionTime = Time.time;
+
+                if (pregnant)
+                    gestationIndex--;
+
+                if (gestationIndex <= 0)
+                {
+                    EntityTracker.Instance.Spawnchild(BabiesGenes, gestationperiod, Coordinate, ((int)Specie), BabyColor);
+                    
+                    pregnant = false;
+                    gestationIndex = gestationperiod;
+                    MatingUrge = 0;
+                }
+
                 //choost action
 
         }
 
 
-          //  Debug.Log("================");
-          //  Debug.Log(pathindex);
-          //  Debug.Log(Specie);
-          //  Debug.Log(PathList);
+        
 
         UpdateStatus();
     
+
+
+
         FindPath();
         
         }
@@ -188,7 +200,30 @@ public class Animal : Alive_entity
     {
         //IF TIRED == 1 INSTANTLY REST
 
+        if (tired > 0.99)
+        {
+            CurrentAction = Actions.Resting;
+            return;
+        }
 
+
+
+
+        if (CurrentAction == Actions.GoingToMate && Mate != null)
+        {
+           
+            if (EntityTracker.Instance.GetDistantance(x, y, Mate.x, Mate.y) < 1.5)
+                CurrentAction = Actions.mating;
+
+            return;
+        }
+        else if (Mate != null && CurrentAction != Actions.mating)
+        {
+            CurrentAction = Actions.GoingToMate;
+        }
+
+       
+        
         if (checkforPredators() && Thirst < CriticalThirstHunger && Hunger < CriticalThirstHunger)
         {
             return;
@@ -201,7 +236,7 @@ public class Animal : Alive_entity
 
 
 
-        if (CurrentAction == Actions.Eating || CurrentAction == Actions.Drinking || CurrentAction == Actions.GoingToWater || CurrentAction == Actions.Goingtofood)
+        if (CurrentAction == Actions.Eating || CurrentAction == Actions.Drinking )
             return;
 
 
@@ -238,16 +273,25 @@ public class Animal : Alive_entity
             
 
         }
+        if (MatingUrge > 0.8 && isfemale == false)
+        {
+            //do thing
+            if (partner == false && FindMate() )
+                return;
+
+            Debug.Log("yep!");
+        }
+
+        if (tired > 0.5) {
+            CurrentAction = Actions.Resting;
+            return;
+                }
 
 
         CurrentAction = Actions.Exploring;
 
 
-        if (horny > 0.8)
-        {
-            //do thing
-        }
-
+       
        
 
 
@@ -410,6 +454,39 @@ public class Animal : Alive_entity
 
             case Actions.chasing:
 
+
+            case Actions.GoingToMate:
+                if (Mate != null && isfemale == false)
+                {
+                    SetTargetLocation(Mate.x, Mate.y);
+                  
+                }
+                else if (Mate == null)
+                    CurrentAction = Actions.Exploring;
+
+                
+                    
+                break;
+
+            case Actions.mating:
+                if (isfemale == true)
+                {
+                    pregnant = true;
+                    BabiesGenes = EntityTracker.Instance.breed(geneValues, Mate.geneValues);
+                    BabyColor = EntityTracker.Instance.Newcolour(GetComponent<Renderer>().material.color, Mate.GetComponent<Renderer>().material.color);
+                    Mate = null;
+                    MatingUrge = 0;
+                }
+                else
+                {
+                    partner = false;
+                    Mate = null;
+                    MatingUrge = 0;
+
+                }
+                    
+            
+
                 break;
 
 
@@ -522,15 +599,20 @@ public class Animal : Alive_entity
             {
                 CurrentAction = Actions.Exploring;
 
-                if (herbivore)
+                if (herbivore && Vegtable_target != null)
                     Vegtable_target.eaten();
-                else
+                else if (eating != null)
                     eating.eaten();
                 
             }
         }
     
     
+
+
+
+
+
     if (CurrentAction == Actions.chasing) // maybe just put this in going to food???
         {
             
@@ -552,6 +634,31 @@ public class Animal : Alive_entity
     
     
     }
+
+
+
+    bool FindMate()
+    {
+        Mate = EntityTracker.Instance.FindMate( Specie,  range + matingrange,  Coordinate, desirabilty);
+
+        if (Mate != null)
+        {
+
+            CurrentAction = Actions.GoingToMate;
+            partner = true;
+
+            Mate.Mate = this;
+            return true;
+        }
+        return false;
+
+    }
+
+ 
+
+
+
+
 
 
     public bool Move()
@@ -592,9 +699,20 @@ public class Animal : Alive_entity
     void FindPath()
     {
 
+
+
         if (PathList != null)
         {
             //Debug.Log("test");
+
+            if (pathindex >= PathList.Count)
+            {
+                PathList = null;
+
+                pathindex = 0;
+                return;
+            }
+
             targetposition = PathList[pathindex];
 
 

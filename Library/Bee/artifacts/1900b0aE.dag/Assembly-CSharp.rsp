@@ -322,6 +322,7 @@
 "Assets/Project/Behaviours/Scripts/Alive_entity.cs"
 "Assets/Project/Behaviours/Scripts/Animal.cs"
 "Assets/Project/Behaviours/Scripts/Animal_Spawner.cs"
+"Assets/Project/Behaviours/Scripts/Breeding.cs"
 "Assets/Project/Behaviours/Scripts/EntityTracker.cs"
 "Assets/Project/Behaviours/Scripts/vegation_manger.cs"
 "Assets/Project/Behaviours/Scripts/Vegtable.cs"

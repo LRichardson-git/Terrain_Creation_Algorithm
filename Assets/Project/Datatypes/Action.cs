@@ -9,6 +9,9 @@ public enum Actions
     SearchingForMate,
     escaping,
     chasing,
+    mating,
+    GoingToMate,
+    waitingformate
 
 }
 

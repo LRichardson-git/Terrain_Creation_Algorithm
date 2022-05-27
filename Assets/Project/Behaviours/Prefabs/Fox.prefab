@@ -12,6 +12,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 518967969736945673, guid: c7f2516db48392548aa14851f89ce815, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 518967969736945673, guid: c7f2516db48392548aa14851f89ce815, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 518967969736945673, guid: c7f2516db48392548aa14851f89ce815, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -55,6 +63,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Fox
       objectReference: {fileID: 0}
+    - target: {fileID: 5137488470697566163, guid: c7f2516db48392548aa14851f89ce815, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 296b3352a51927947b5c09552ea48a51, type: 2}
     - target: {fileID: 6228017221218397952, guid: c7f2516db48392548aa14851f89ce815, type: 3}
       propertyPath: Ani
       value: 1
@@ -63,6 +75,10 @@ PrefabInstance:
       propertyPath: range
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 6228017221218397952, guid: c7f2516db48392548aa14851f89ce815, type: 3}
+      propertyPath: material
+      value: 
+      objectReference: {fileID: 2100000, guid: 296b3352a51927947b5c09552ea48a51, type: 2}
     - target: {fileID: 6228017221218397952, guid: c7f2516db48392548aa14851f89ce815, type: 3}
       propertyPath: herbivore
       value: 0
