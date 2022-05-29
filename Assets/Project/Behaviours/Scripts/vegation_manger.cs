@@ -12,6 +12,17 @@ public class vegation_manger : MonoBehaviour
     public Vegtable Vegation_Prefab;
     public GameObject Vegtables;
 
+
+    public List<Vegetion> RabbitDiet;
+    public List<Vegetion> FoxDiet;
+    public List<Vegetion> deerDiet;
+    public List<Vegetion> BoarDiet;
+    public List<Vegetion> raccoonDiet;
+    public List<Vegetion> SquriellDiet;
+    public List<Vegetion> RhinoDiet;
+    public List<Vegetion> BearDiet; //berries, grain, fish mammals
+    public List<Vegetion> GoirralDiet;
+    public List<Vegetion> FrogDiet;
     int width =200;
     int height  =200;
     //Dictaronrys for vegtbales
@@ -87,12 +98,18 @@ public class vegation_manger : MonoBehaviour
 
         //Set up dictationiers
         Eatablevegatblesbyspecies = new Dictionary<Species, List<Vegetion>>();
-        Eatablevegatblesbyspecies.Add(Species.Rabbit, new List<Vegetion>());
-        Eatablevegatblesbyspecies.Add(Species.fox, new List<Vegetion>());
+        Eatablevegatblesbyspecies.Add(Species.Rabbit, RabbitDiet);
+        Eatablevegatblesbyspecies.Add(Species.fox, FoxDiet);
+        Eatablevegatblesbyspecies.Add(Species.bear, BearDiet);
+        Eatablevegatblesbyspecies.Add(Species.boar, BoarDiet);
+        Eatablevegatblesbyspecies.Add(Species.deer, deerDiet);
+        Eatablevegatblesbyspecies.Add(Species.Frogs, FrogDiet);
+        Eatablevegatblesbyspecies.Add(Species.gorrila, GoirralDiet);
+        Eatablevegatblesbyspecies.Add(Species.lion, new List<Vegetion>());
+        Eatablevegatblesbyspecies.Add(Species.raccoon, raccoonDiet);
+        Eatablevegatblesbyspecies.Add(Species.Rhino, RhinoDiet);
+        Eatablevegatblesbyspecies.Add(Species.squirrel,SquriellDiet);
 
-        Eatablevegatblesbyspecies[(Species.Rabbit)].Add(Vegetion.carrot);
-        Eatablevegatblesbyspecies[(Species.Rabbit)].Add(Vegetion.letuce);
-        Eatablevegatblesbyspecies[(Species.Rabbit)].Add(Vegetion.apples);
 
 
         //set up liss in dictonaries
@@ -100,7 +117,12 @@ public class vegation_manger : MonoBehaviour
         ListofVegtables.Add(Vegetion.carrot, new List<Vegtable>());
         ListofVegtables.Add(Vegetion.apples, new List<Vegtable>());
         ListofVegtables.Add(Vegetion.letuce, new List<Vegtable>());
+        ListofVegtables.Add(Vegetion.bamboo, new List<Vegtable>());
+        ListofVegtables.Add(Vegetion.bannas, new List<Vegtable>());
+        ListofVegtables.Add(Vegetion.Grass, new List<Vegtable>());
+        ListofVegtables.Add(Vegetion.hay, new List<Vegtable>());
         ListofVegtables.Add(Vegetion.tomatoes, new List<Vegtable>());
+        ListofVegtables.Add(Vegetion.wheat, new List<Vegtable>());
 
 
         //Create a carrot in the world (game wont work when I dlete this for some reason

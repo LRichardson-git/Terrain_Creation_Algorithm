@@ -24,9 +24,9 @@ public class Vegtable : MonoBehaviour
     public void eaten ()
     {
         vegation_manger.Instance.removeVeg(type, this, xy);
-        Debug.Log(xy.x);
-        Debug.Log(xy.y);
-        Debug.Log("EATEN");
+        //Debug.Log(xy.x);
+       // Debug.Log(xy.y);
+        //Debug.Log("EATEN");
         Destroy(gameObject);
         
 

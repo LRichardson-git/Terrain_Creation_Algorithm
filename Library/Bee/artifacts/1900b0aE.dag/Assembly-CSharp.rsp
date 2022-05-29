@@ -330,7 +330,6 @@
 "Assets/Project/Datatypes/ReasonForDeath.cs"
 "Assets/Project/Datatypes/Specie.cs"
 "Assets/Project/Enviroment/References/FastNoise.cs"
-"Assets/Project/Enviroment/Scripts/Building_Generator.cs"
 "Assets/Project/Enviroment/Scripts/Coords.cs"
 "Assets/Project/Enviroment/Scripts/Display_Map.cs"
 "Assets/Project/Enviroment/Scripts/Erosion.cs"
@@ -340,7 +339,6 @@
 "Assets/Project/Enviroment/Scripts/movement.cs"
 "Assets/Project/Enviroment/Scripts/Noise_Maps.cs"
 "Assets/Project/Enviroment/Scripts/Textures.cs"
-"Assets/Project/Enviroment/Scripts/Vegation.cs"
 "Assets/Project/Player/CharacterMovement.cs"
 "Assets/Project/Player/Inputs_handle.cs"
 -langversion:8.0

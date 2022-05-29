@@ -29,9 +29,18 @@ public class EntityTracker : MonoBehaviour
     //water
     List<Coords> WaterTiles;
     List<Coords> WaterTilesAdjacent;
-    
 
-   //storing lists o
+    //List of what things eat
+
+    public List<Species> FoxDietMeat;
+    public List<Species> raccoonDietMeat;
+    public List<Species> SquriellDietMeat;
+    public List<Species> LionDiet;//deer boar rhino raccon (if really hungry BEAR GOIRRLA)
+    public List<Species> BearDietmeat;
+    public List<Species> IncludedSpecies;
+    public List<Species> IncludedSpeciesnonmeat;
+
+    //storing lists o
     public Dictionary<Species, List<Alive_entity>> SpeciesMap;
     public Dictionary<Species, List<Species>> PreySpecies;
     public Dictionary<Species, List<Species>> PredatorSpecies;
@@ -39,7 +48,7 @@ public class EntityTracker : MonoBehaviour
 
     //Prefabs
     public List<Animal> Alive_Entities_Prefabs;
-    List<Species> SpeciesTypeList;
+     List<Species> SpeciesTypeList;
     Vector3 TempLoc;
 
     
@@ -75,7 +84,7 @@ public class EntityTracker : MonoBehaviour
         // Debug.Log(Specis);
 
         float maxdist = Range;
-
+        
         List<Species> PredatorSpeciesList = PredatorSpecies[Specis];
 
         for (int i = 0; i < PredatorSpeciesList.Count; i++)
@@ -157,6 +166,17 @@ public class EntityTracker : MonoBehaviour
         SpeciesTypeList = new List<Species>();
         SpeciesTypeList.Add(Species.Rabbit);
         SpeciesTypeList.Add(Species.fox);
+        SpeciesTypeList.Add(Species.deer);
+        SpeciesTypeList.Add(Species.boar);
+        SpeciesTypeList.Add(Species.raccoon);
+        SpeciesTypeList.Add(Species.squirrel);
+        SpeciesTypeList.Add(Species.Rhino);
+        SpeciesTypeList.Add(Species.lion);
+        SpeciesTypeList.Add(Species.bear);
+        SpeciesTypeList.Add(Species.gorrila);
+        SpeciesTypeList.Add(Species.Frogs);
+        
+
 
         Debugg = 85;
         //lopp through water
@@ -243,21 +263,55 @@ public class EntityTracker : MonoBehaviour
         //create dictionarys for tracking entitiers and getting species
     
         SpeciesMap = new Dictionary<Species, List<Alive_entity>>();
-        SpeciesMap.Add(Species.Rabbit, new List<Alive_entity>());
-        SpeciesMap.Add(Species.fox, new List<Alive_entity>());
 
+        for (int i = 0; i < IncludedSpecies.Count; i++)
+        {
+            SpeciesMap.Add(IncludedSpecies[i], new List<Alive_entity>());
+        }
 
         PreySpecies = new Dictionary<Species, List<Species>>();
-        PreySpecies.Add(Species.fox, new List<Species>());
-        PreySpecies[(Species.fox)].Add(Species.Rabbit);
 
+        for (int i = 0; i < IncludedSpeciesnonmeat.Count; i++)
+        {
+            PreySpecies.Add(IncludedSpeciesnonmeat[i], new List<Species>());
 
-        //for now hardcode until otherwise
+        }
+        PreySpecies.Add(Species.fox,  FoxDietMeat);
+        PreySpecies.Add(Species.raccoon, raccoonDietMeat);
+        PreySpecies.Add(Species.squirrel, SquriellDietMeat);
+        PreySpecies.Add(Species.lion, LionDiet);
+        PreySpecies.Add(Species.bear, BearDietmeat);
+
+        
+    //for now hardcode until otherwise
         PredatorSpecies = new Dictionary<Species, List<Species>>();
-        PredatorSpecies.Add(Species.Rabbit, new List<Species>());
-        PredatorSpecies[(Species.Rabbit)].Add(Species.fox);
-        PredatorSpecies.Add(Species.fox, new List<Species>());
 
+        for (int i = 0; i < IncludedSpecies.Count; i++)
+        {
+            PredatorSpecies.Add(IncludedSpecies[i], new List<Species>());
+            for (int j = 0; j < IncludedSpecies.Count; j++)
+            {
+
+                if (PreySpecies[IncludedSpecies[j]] != null)
+                {
+
+                    for (int k = 0; k < PreySpecies[IncludedSpecies[j]].Count; k++)
+                    {
+
+                        if (PreySpecies[IncludedSpecies[j]][k] == IncludedSpecies[i])
+                        {
+                            PredatorSpecies[(IncludedSpecies[i])].Add(IncludedSpecies[j]);
+                            Debug.Log(IncludedSpecies[i]);
+                            Debug.Log(IncludedSpecies[j]);
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+     
         SpawnInitalAnimals(10, Biome2, 20);
         Debug.Log("inition done");
       
@@ -378,6 +432,7 @@ public class EntityTracker : MonoBehaviour
 
         Animal NewEntity = Instantiate(Alive_Entities_Prefabs[specie], TempLoc, Quaternion.identity);
         NewEntity.init(GeneValues, Spawn, GroupCentre[index],MatColor, Initial);
+        Debug.Log(SpeciesTypeList[specie]);
         SpeciesMap[(SpeciesTypeList[specie])].Add(NewEntity);
         NewEntity.transform.SetParent(Animals.transform);
         //  Debugg -= 10;

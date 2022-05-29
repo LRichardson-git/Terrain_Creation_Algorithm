@@ -71,8 +71,6 @@
     <Compile Include="Assets\Project\Enviroment\Scripts\movement.cs" />
     <Compile Include="Assets\Project\Enviroment\Scripts\Display_Map.cs" />
     <Compile Include="Assets\Project\Player\CharacterMovement.cs" />
-    <Compile Include="Assets\Project\Enviroment\Scripts\Building_Generator.cs" />
-    <Compile Include="Assets\Project\Enviroment\Scripts\Vegation.cs" />
     <Compile Include="Assets\Project\Datatypes\ReasonForDeath.cs" />
     <Compile Include="Assets\Project\Behaviours\Scripts\Animal_Spawner.cs" />
     <Compile Include="Assets\Project\Player\Inputs_handle.cs" />

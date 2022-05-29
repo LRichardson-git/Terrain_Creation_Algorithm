@@ -138,7 +138,7 @@ public class Map_Generation : MonoBehaviour
         //Create references to scripts that generate buildings, map and vegation
         Display_Map Display = FindObjectOfType<Display_Map>();
         
-        Vegation veg = FindObjectOfType<Vegation>();
+  
 
 
 

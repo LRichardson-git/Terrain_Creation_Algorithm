@@ -12,14 +12,15 @@ public class Animal : Alive_entity
     float tired;
      float maxMatingTime = 150;
     float maxTiredTime = 250;
-
+    
     //speeds
     float drinkSpeed = 7;
     float eatSpeed = 11;
     public float movespeed = 20;
-
-
-    
+    public float waterTrheshhold = 0.5f;
+    public float HungerTHreshold = 0.4f;
+    public float matingTHreshold = 0.8f;
+    public float tiredTHreshold = 0.55f;
     //Genes
     public bool herbivore = true;
     public int range;
@@ -168,15 +169,17 @@ public class Animal : Alive_entity
                 LastActionTime = Time.time;
 
                 if (pregnant)
+                {
                     gestationIndex--;
 
-                if (gestationIndex <= 0)
-                {
-                    EntityTracker.Instance.Spawnchild(BabiesGenes, gestationperiod, Coordinate, ((int)Specie), BabyColor);
-                    
-                    pregnant = false;
-                    gestationIndex = gestationperiod;
-                    MatingUrge = 0;
+                    if (gestationIndex <= 0)
+                    {
+                        EntityTracker.Instance.Spawnchild(BabiesGenes, gestationperiod, Coordinate, ((int)Specie), BabyColor);
+
+                        pregnant = false;
+                        gestationIndex = gestationperiod;
+                        MatingUrge = 0;
+                    }
                 }
 
                 //choost action
@@ -200,13 +203,11 @@ public class Animal : Alive_entity
     {
         //IF TIRED == 1 INSTANTLY REST
 
-        if (tired > 0.99)
+        if (tired > 0.98)
         {
             CurrentAction = Actions.Resting;
             return;
         }
-
-
 
 
         if (CurrentAction == Actions.GoingToMate && Mate != null)
@@ -217,6 +218,7 @@ public class Animal : Alive_entity
 
             return;
         }
+
         else if (Mate != null && CurrentAction != Actions.mating)
         {
             CurrentAction = Actions.GoingToMate;
@@ -226,9 +228,10 @@ public class Animal : Alive_entity
         
         if (checkforPredators() && Thirst < CriticalThirstHunger && Hunger < CriticalThirstHunger)
         {
-            return;
-            
+            return;      
         }
+
+
 
         if (CurrentAction == Actions.chasing && EntityTracker.Instance.GetDistantance(x, y, eating.x, eating.y) <= range)
             return;
@@ -248,44 +251,42 @@ public class Animal : Alive_entity
         }
 
 
-        if (Thirst > 0.5 && CurrentAction != Actions.GoingToWater && CurrentAction != Actions.Drinking)
+        if (Thirst > waterTrheshhold)
         {
-            if (!findwater())
-                CurrentAction = Actions.Exploring;
-            return;
-        }
-
-
-
-        if (Hunger >= 0.4 && CurrentAction != Actions.Goingtofood && CurrentAction != Actions.Eating && CurrentAction != Actions.Drinking)
-        {
-            bool temp = false;
-
-            if (herbivore)
-                temp = foodHerbivore();
-            else
-                temp = foodMeat();
-
-            if (temp)
+            if (findwater())
                 return;
+        }
 
+
+
+        if (Hunger >= HungerTHreshold)
+        {
             
+            if (herbivore)
+                if (foodHerbivore())
+                    return;
+                else if (foodMeat() || foodHerbivore())
+                    return;
+
             
 
         }
-        if (MatingUrge > 0.8 && isfemale == false)
+
+        if (MatingUrge > matingTHreshold && isfemale == false)
         {
-            //do thing
+            //check for mating at top of sequence
+
             if (partner == false && FindMate() )
                 return;
 
-            Debug.Log("yep!");
+            //Debug.Log("yep!");
         }
 
-        if (tired > 0.5) {
+
+        if (tired > tiredTHreshold) {
             CurrentAction = Actions.Resting;
             return;
-                }
+           }
 
 
         CurrentAction = Actions.Exploring;
@@ -386,11 +387,13 @@ public class Animal : Alive_entity
         }
 
 
-        if ( CurrentAction != Actions.Goingtofood)
+        if (CurrentAction != Actions.Goingtofood)
         {
             if (FindVegtable())
                 return true;
         }
+        else
+            return true;
 
 
         return false;
@@ -399,14 +402,12 @@ public class Animal : Alive_entity
     {
 
   
-        if (CurrentAction != Actions.Goingtofood)
-        {
 
             if (findMeat())
             {
                 return true;
             }
-        }
+        
         return false;
 
     }
@@ -438,8 +439,10 @@ public class Animal : Alive_entity
                 break;
 
             case Actions.Goingtofood:
-                if (herbivore)
+                if (Vegtable_target != null)
                     SetTargetLocation(Vegtable_target.xy.x, Vegtable_target.xy.y);
+                else
+                    CurrentAction = Actions.Exploring;
                 
                 break;
 

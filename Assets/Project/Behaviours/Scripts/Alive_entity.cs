@@ -36,8 +36,10 @@ public class Alive_entity : MonoBehaviour
         if (partner)
         {
             if (Mate != null)
+            {
                 Mate.partner = false;
-            Mate.CurrentAction = Actions.Exploring;
+                Mate.CurrentAction = Actions.Exploring;
+            }
         }
 
         if (cause == Death.decompose || food <= 0)
