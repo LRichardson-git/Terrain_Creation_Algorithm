@@ -417,7 +417,7 @@ public class Map_Generation : MonoBehaviour
 
                 }
         }
-        Map_Colour[28 * Width + 93] = Color.red;
+        //Map_Colour[28 * Width + 93] = Color.red;
         /*
         
         Color[] mapcolours = Map_Colour;

@@ -178,7 +178,7 @@ public class EntityTracker : MonoBehaviour
         
 
 
-        Debugg = 85;
+        //Debugg = 85;
         //lopp through water
         for (int x = 0; x < width; x++)
         {
@@ -190,7 +190,8 @@ public class EntityTracker : MonoBehaviour
                 if (Map_Colour[x * 200 + y] == Biome2)
                 {
 
-
+                    Debug.Log(x);
+                    Debug.Log(y);
                     MapIndex[x, y].IsWalkable = false;
                     watertile = new Coords(x, y);
                     WaterTiles.Add(watertile);
@@ -301,8 +302,7 @@ public class EntityTracker : MonoBehaviour
                         if (PreySpecies[IncludedSpecies[j]][k] == IncludedSpecies[i])
                         {
                             PredatorSpecies[(IncludedSpecies[i])].Add(IncludedSpecies[j]);
-                            Debug.Log(IncludedSpecies[i]);
-                            Debug.Log(IncludedSpecies[j]);
+
                         }
                     }
 
@@ -429,12 +429,12 @@ public class EntityTracker : MonoBehaviour
        // Spawn.x = 30;
      //   Spawn.y = Debugg;
         TempLoc = EntityTracker.Instance.Coordtoworld(Spawn);
-
-        Animal NewEntity = Instantiate(Alive_Entities_Prefabs[specie], TempLoc, Quaternion.identity);
+        Animal NewEntity = Instantiate(Alive_Entities_Prefabs[specie], TempLoc, Alive_Entities_Prefabs[specie].transform.rotation );
         NewEntity.init(GeneValues, Spawn, GroupCentre[index],MatColor, Initial);
-        Debug.Log(SpeciesTypeList[specie]);
+
         SpeciesMap[(SpeciesTypeList[specie])].Add(NewEntity);
         NewEntity.transform.SetParent(Animals.transform);
+        NewEntity.transform.position = TempLoc;
         //  Debugg -= 10;
         //add to dictariony and location list
 
@@ -693,7 +693,7 @@ public class EntityTracker : MonoBehaviour
     public List<Vector3> FindPath(int xEnd, int yEnd, int xSt, int ySt)
     {
         //Debug.Log("PATH");
-        if (xEnd < 0 || xEnd > 199 || yEnd < 0 || yEnd > 199)
+        if (xEnd < 1 || xEnd > 198 || yEnd < 1 || yEnd > 198)
             return null;
 
         if (MapIndex[xEnd, yEnd].IsWalkable == false)
@@ -708,7 +708,7 @@ public class EntityTracker : MonoBehaviour
 
         List<Coords> ClosedList = new List<Coords>();
 
-
+        int check = 0;
 
 
 
@@ -790,6 +790,12 @@ public class EntityTracker : MonoBehaviour
         }
 
         //out of nodes on list (searched through whole map and cant find path
+        Debug.Log(xSt);
+        Debug.Log(ySt);
+        Debug.Log(xEnd);
+        Debug.Log(yEnd);
+        Debug.Log(MapIndex[xEnd, yEnd].IsWalkable);
+
         Debug.Log("null");
         return null;
 
@@ -801,7 +807,7 @@ public class EntityTracker : MonoBehaviour
         Vector3 Trans;
         Trans.x = Transcoord.x * 10 + 5;
         Trans.z = Transcoord.y * 10 + 5;
-        Trans.y = 5;
+        Trans.y = 7f;
         //  Debug.Log(Transcoord.x);
         //  Debug.Log(Transcoord.y);
         //  Debug.Log(Trans);

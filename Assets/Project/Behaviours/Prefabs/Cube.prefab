@@ -27,9 +27,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2997139953420067964}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.601139, y: -1.4954681, z: 26.223448}
-  m_LocalScale: {x: 10, y: 10, z: 10}
-  m_Children: []
+  m_LocalPosition: {x: 11.161, y: 0.21331, z: 25}
+  m_LocalScale: {x: 2.9683108, y: 2.0132697, z: 1.8535737}
+  m_Children:
+  - {fileID: 278203757294995606}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -111,6 +112,10 @@ MonoBehaviour:
   geneValues: 
   CurrentAction: 0
   movespeed: 3
+  waterTrheshhold: 0.5
+  HungerTHreshold: 0.4
+  matingTHreshold: 0.8
+  tiredTHreshold: 0.55
   herbivore: 1
   range: 25
   gestationperiod: 5
@@ -124,3 +129,33 @@ MonoBehaviour:
   Thirst: 0
   decompose: 0
   Ani: 0
+--- !u!1 &3315001978231240145
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 278203757294995606}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &278203757294995606
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3315001978231240145}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.07796427, y: -0.2520834, z: 1.2030416}
+  m_LocalScale: {x: 0.18558367, y: 0.33138067, z: 0.29719347}
+  m_Children: []
+  m_Father: {fileID: 518967969736945673}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

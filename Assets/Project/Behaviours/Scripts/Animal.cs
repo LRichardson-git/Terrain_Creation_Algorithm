@@ -50,8 +50,7 @@ public class Animal : Alive_entity
     float MaxHunger = 150;
     float MaxThirst = 190;
     float TimetoDecompose = 90;
-
-    //Other Entities
+        //Other Entities
     Alive_entity Predator;
     public Alive_entity eating;
     Vegtable Vegtable_target;
@@ -99,14 +98,14 @@ public class Animal : Alive_entity
         if (geneValues[1] > 220) // randomize colour if this gene passes test
         {
 
-            GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+            GetComponentInChildren<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
 
-
+            
         }
         else if (inital != true)
         {
-            GetComponent<Renderer>().material.color = Matcolor;
-
+            GetComponentInChildren<Renderer>().material.color = Matcolor;
+            
         }
        //etComponent<MeshRenderer>().material = Matcolour;
         //add passed on mat colour
@@ -125,7 +124,7 @@ public class Animal : Alive_entity
         MaxThirst -= ((movespeed / 2) + (movespeed / 3));
         Specie = Ani;
 
-        
+
       
         gestationIndex = gestationperiod;
 }
@@ -692,12 +691,15 @@ public class Animal : Alive_entity
                 return true;
             }
             return false;
+
         
 
 
 
-
     }
+
+ 
+
 
     void FindPath()
     {
@@ -717,8 +719,17 @@ public class Animal : Alive_entity
             }
 
             targetposition = PathList[pathindex];
+            if (PathList.Count > 1)
+            {
 
+                //var lookpos = targetposition - transform.position;
+               // var rotation = Quaternion.LookRotation(lookpos);
+                
+               //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime);
+                transform.LookAt(targetposition,transform.up);
+                  //transform.Rotate(transform.rotation.x, transform.rotation.y - 90, transform.rotation.z);
 
+            }
             // Vector3 Temp = EntityTracker.Instance.GetGrid(newPos);
             Vector2 Temp = EntityTracker.Instance.GetGrid(transform.position);
 
@@ -739,6 +750,7 @@ public class Animal : Alive_entity
             //transform.position = PathList[0];
             if (Vector3.Distance(transform.position, targetposition) > 0.2f)
             {
+
                 Vector3 moveD = (targetposition - transform.position).normalized;
                 transform.position = transform.position + moveD * movespeed * Time.deltaTime;
                 if (Vector3.Distance(transform.position, targetposition) < 0.2f)

@@ -29,7 +29,7 @@ public class vegation_manger : MonoBehaviour
     Dictionary<Species, List<Vegetion>> Eatablevegatblesbyspecies;
     Dictionary<Vegetion, List<Vegtable>> ListofVegtables;
     Dictionary<Season, List<Vegetion>> VegetionBySeason;
-
+    public List<Vegetion> Vegtabless;
     //References to map
     Color[] Colour_Map;
     Color ColourWater;
@@ -114,16 +114,14 @@ public class vegation_manger : MonoBehaviour
 
         //set up liss in dictonaries
         ListofVegtables = new Dictionary<Vegetion, List<Vegtable>>();
-        ListofVegtables.Add(Vegetion.carrot, new List<Vegtable>());
-        ListofVegtables.Add(Vegetion.apples, new List<Vegtable>());
-        ListofVegtables.Add(Vegetion.letuce, new List<Vegtable>());
-        ListofVegtables.Add(Vegetion.bamboo, new List<Vegtable>());
-        ListofVegtables.Add(Vegetion.bannas, new List<Vegtable>());
-        ListofVegtables.Add(Vegetion.Grass, new List<Vegtable>());
-        ListofVegtables.Add(Vegetion.hay, new List<Vegtable>());
-        ListofVegtables.Add(Vegetion.tomatoes, new List<Vegtable>());
-        ListofVegtables.Add(Vegetion.wheat, new List<Vegtable>());
 
+        for (int i = 0; i < Vegtabless.Count; i++)
+        {
+            ListofVegtables.Add(Vegtabless[i], new List<Vegtable>());
+
+        }
+        
+        
 
         //Create a carrot in the world (game wont work when I dlete this for some reason
         VegCord = new Coords(35, 95);
@@ -485,11 +483,15 @@ public class vegation_manger : MonoBehaviour
         returnvegtable.xy.x = -1;
         List<Vegetion> VegtebaleSpeciesList = Eatablevegatblesbyspecies[Specis];
 
+        
+            
+
         //VEGTABLE == class not Vegtable
 
         for (int i = 0; i < VegtebaleSpeciesList.Count; i++)
         {
-
+            if (Specis == Species.lion)
+                continue;
             // Debug.Log(i);
             List<Vegtable> VegtableList = ListofVegtables[VegtebaleSpeciesList[i]];
 
