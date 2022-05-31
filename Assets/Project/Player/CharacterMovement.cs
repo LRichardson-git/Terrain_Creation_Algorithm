@@ -36,6 +36,8 @@ public class CharacterMovement : MonoBehaviour
     public Text Speed;
     public Text SleepNess;
     public Text LockedOn;
+    public Text mating;
+    public Text mating2;
     bool checker;
   
 
@@ -72,6 +74,8 @@ public class CharacterMovement : MonoBehaviour
 
         if (Input.GetMouseButton(1))
             rotatetoMovementVector(MovementVec);
+        else if (follow == true && Input.GetMouseButton(1))
+            follow = !follow;
 
 
 
@@ -89,7 +93,7 @@ public class CharacterMovement : MonoBehaviour
         if (follow == true && Selected != null)
         {
             CamPos.x = Selected.transform.position.x - t;
-            CamPos.y = Selected.transform.position.y + 100;
+            CamPos.y = Selected.transform.position.y + 110;
             CamPos.z = Selected.transform.position.z - 80;
 
 
@@ -100,17 +104,14 @@ public class CharacterMovement : MonoBehaviour
             Thirst.text = "Thirst: " + Selected.GetComponent<Animal>().Thirst;
             Speed.text = "Speed: " + Selected.GetComponent<Animal>().speed;
             SleepNess.text = "Tired: " + Selected.GetComponent<Animal>().tired;
+            mating.text = "MatingUrge: " + Selected.GetComponent<Animal>().MatingUrge;
+            if (Selected.isfemale == true)
+                mating2.text = "Pregant: " + Selected.pregnant;
+            else
+                mating2.text = "Pregant: IsMale(can't)";
+          
             LockedOn.text = "True";
-            /*
-                        public Text Species;
-                public Text Location;
-                public Text Status;
-                public Text Hunger;
-                public Text Thirst;
-                public Text Speed;
-                public Text SleepNess;
-                public Text LockedOn;
-            */
+
 
 
 
@@ -120,7 +121,7 @@ public class CharacterMovement : MonoBehaviour
             follow = false;
 
             CamPos.x = transform.position.x - t;
-            CamPos.y = transform.position.y + 100;
+            CamPos.y = transform.position.y + 110;
             CamPos.z = transform.position.z - 80;
         }
         LockedOn.text = "LockOn:" + follow;
@@ -153,6 +154,37 @@ public class CharacterMovement : MonoBehaviour
 
 
         Cam.transform.position = CamPos;
+    }
+
+    //look correct way
+    public void MatingURge()
+    {
+        Selected.GetComponent<Animal>().MatingUrge += 0.1f;
+    }
+
+    public void Speedup() {
+
+
+        Selected.GetComponent<Animal>().speed += 1;
+
+
+    }
+    public void speedDown()
+    {
+        Selected.GetComponent<Animal>().speed -= 1;
+    }
+
+    public void HungerB()
+    {
+
+        Selected.GetComponent<Animal>().Hunger -= 0.1f;
+
+    }
+
+    public void ThirstB()
+    {
+        Selected.GetComponent<Animal>().Thirst -= 0.1f;
+
     }
 
     private void rotatetoMovementVector(Vector3 MovementVec)

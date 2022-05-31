@@ -22,7 +22,7 @@ public class EntityTracker : MonoBehaviour
 
     public Text DeathText;
     public Text Births;
-    
+    bool started;
     //Pathfinding
     public static bool[,] walkable;
     private const int m_Move_Straight_Cost = 10;
@@ -31,8 +31,11 @@ public class EntityTracker : MonoBehaviour
     public Coords[,] MapIndex;
     public List<Death> REASONS;
     int births;
-
-
+    int AmountPerGroup = 20;
+    int Groups1 = 10;
+    
+    public Text Spawning1;
+    public Text Spawning2;
     
     //water
     List<Coords> WaterTiles;
@@ -72,9 +75,43 @@ public class EntityTracker : MonoBehaviour
     {
         DeathText.text = "Deaths: " + Deaths;
         Births.text = "Births: " + births;
-     }
 
-    public void RemoveEntity(Species speciy, Alive_entity Entity)
+        if (started == false)
+        {
+
+            if (Input.GetKeyDown("5"))
+            {
+                AmountPerGroup--;
+
+            }
+
+            if (Input.GetKeyDown("6"))
+            {
+                AmountPerGroup++;
+
+            }
+            //lol
+
+            if (Input.GetKeyDown("7"))
+            {
+                Groups1--;
+
+            }
+
+            if (Input.GetKeyDown("8"))
+            {
+                Groups1++;
+
+            }
+
+            Spawning1.text = "AnimalsPerGroup: " + AmountPerGroup;
+            Spawning2.text = "Groups of animals: " + Groups1;
+
+
+        }
+    }
+
+        public void RemoveEntity(Species speciy, Alive_entity Entity)
     {
         SpeciesMap[speciy].Remove(Entity);
 
@@ -344,7 +381,7 @@ public class EntityTracker : MonoBehaviour
 
      
         SpawnInitalAnimals(10, Biome2, 20);
-
+        started = true;
 
         Debug.Log("inition done");
 
@@ -848,16 +885,15 @@ public class EntityTracker : MonoBehaviour
     public Alive_entity SelectClosestEntity(Vector3 Position)
     {
         Vector2 lol = GetGrid(Position);
-        Debug.Log(lol.x);
-        Debug.Log(lol.y);
+
         for (int i = 0; i < IncludedSpecies.Count; i++)
         {
             for (int j = 0; j < SpeciesMap[IncludedSpecies[i]].Count; j++)
             {
                 if (GetDistantance((int)lol.x, (int)lol.y, SpeciesMap[IncludedSpecies[i]][j].x, SpeciesMap[IncludedSpecies[i]][j].y) < 1.5)
                 {
-                    Debug.Log(lol.x);
-                    Debug.Log(lol.y);
+
+
                     return SpeciesMap[IncludedSpecies[i]][j];
                 }
 

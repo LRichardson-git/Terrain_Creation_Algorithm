@@ -6,9 +6,22 @@ using UnityEngine;
 public class Map_Generation : MonoBehaviour
 {
 
+    enum gameState
+    {
+        Menu,
+        Start,
+        game
 
-
+    }
+    bool setup;
+    public GameObject Menu;
+    public GameObject Ingame;
+    public GameObject player;
+    public Camera Cam;
+    gameState Game;
+    public GameObject CamNormal;
     public static Map_Generation mapGen;
+    public GameObject CampPosObj;
 
     //Values for map generation
     public int Width;
@@ -89,6 +102,8 @@ public class Map_Generation : MonoBehaviour
             mapGen = this;
 
         Generate_Map();
+
+        Game = gameState.Menu;
     }
 
     public void Generate_Map()
@@ -326,25 +341,50 @@ public class Map_Generation : MonoBehaviour
     }
 
 
+    public void GameStart()
+    {
+        Game = gameState.Start;
+    }
+
     void Update()
     {
-       
 
-        if (Input.GetKeyDown("down"))
+        if (setup == false)
         {
-            
-            EntityTracker.Instance.Init(Map_Colour, Biomes[1].colour, Width, Map_Noise2);
-            vegation_manger.Instance.init(Map_Colour, Biomes[1].colour, Biomes[5].colour);
-            
-            
+            if (Game == gameState.Menu)
+            {
+                Ingame.SetActive(false);
+                player.SetActive(false);
+
+                Cam.transform.position = CampPosObj.transform.position;
+                Cam.transform.rotation = CampPosObj.transform.rotation;
+                Cam.fieldOfView = 95;
+                Debug.Log("lol");
+            }
+
+
+
+
+            if (Game == gameState.Start)
+            {
+                player.SetActive(true);
+
+                EntityTracker.Instance.Init(Map_Colour, Biomes[1].colour, Width, Map_Noise2);
+                vegation_manger.Instance.init(Map_Colour, Biomes[1].colour, Biomes[5].colour);
+                Game = gameState.game;
+            }
+
+            if (Game == gameState.game)
+            {
+                Menu.SetActive(false);
+                Ingame.SetActive(true);
+                Cam.fieldOfView = 80;
+                Cam.transform.rotation = CamNormal.transform.rotation;
+                setup = true;
+            }
+
         }
 
-
-        if (Input.GetKeyDown("left"))
-        {
-
-            EntityTracker.Instance.DebugPring();
-        }
     }
 
         //changed to flatten the map

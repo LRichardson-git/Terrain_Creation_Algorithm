@@ -24,10 +24,15 @@ public class vegation_manger : MonoBehaviour
     public List<Vegetion> GoirralDiet;
     public List<Vegetion> FrogDiet;
     public List<Color> Vegcolors;
-
+    public Text Spawning;
+    public Text groupssp;
+    
     public Text VegtablesT;
     int width =200;
     int height  =200;
+    bool started;
+    int VegtablesPerGroup;
+    int Groupss = 12;
     //Dictaronrys for vegtbales
     Dictionary<Species, List<Vegetion>> Eatablevegatblesbyspecies;
     Dictionary<Vegetion, List<Vegtable>> ListofVegtables;
@@ -94,8 +99,7 @@ public class vegation_manger : MonoBehaviour
 
 
 
-
-
+        
         //Set up dictationiers
         Eatablevegatblesbyspecies = new Dictionary<Species, List<Vegetion>>();
         Eatablevegatblesbyspecies.Add(Species.Rabbit, RabbitDiet);
@@ -137,7 +141,8 @@ public class vegation_manger : MonoBehaviour
 
 
         //Create initial vegtables
-        NewSeasonVegtables(currentSeason, 10);
+        NewSeasonVegtables(currentSeason, Groupss);
+        started = true;
 
 
     }
@@ -145,8 +150,8 @@ public class vegation_manger : MonoBehaviour
 
     void Update()
     {
-
-        VegtablesT.text = "Vegtables: " + Locations.Count;
+        
+        
 
 
         float TimeSinceLastAction = Time.time - LastWeek;
@@ -182,6 +187,48 @@ public class vegation_manger : MonoBehaviour
 
             LastWeek = Time.time;
         }
+
+
+
+        if (started == false)
+        {
+
+            if (Input.GetKeyDown("1"))
+            {
+                SpawnAmount--;
+
+            }
+
+            if (Input.GetKeyDown("2"))
+            {
+                SpawnAmount++;
+
+            }
+
+
+            if (Input.GetKeyDown("3"))
+            {
+                Groupss--;
+
+            }
+
+            if (Input.GetKeyDown("4"))
+            {
+                Groupss++;
+
+            }
+
+            Spawning.text = "AvgamtofVegtablesPergroup: " + SpawnAmount;
+            groupssp.text = "Groups Of veg: " + Groupss;
+
+
+        }
+        else
+            VegtablesT.text = "Vegtables: " + Locations.Count;
+
+
+
+
     }
 
 
