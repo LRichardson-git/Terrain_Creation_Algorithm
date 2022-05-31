@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 
 
@@ -20,11 +20,30 @@ public class CharacterMovement : MonoBehaviour
     private float rotateSpeed;
     [SerializeField]
     private Camera Cam;
-
+    public GameObject test;
     
     private int t = 100;
     public float gravity = -10f;
-    
+    Alive_entity Selected;
+    bool follow;
+
+
+    public Text Species;
+    public Text Location;
+    public Text Status;
+    public Text Hunger;
+    public Text Thirst;
+    public Text Speed;
+    public Text SleepNess;
+    public Text LockedOn;
+    public Text Deaths;
+    public Text Births;
+    public Text Vegtables;
+
+
+
+    public static CharacterMovement Instance { get; private set; }
+
     public Coords lol2;
     public Coords lol3;
     private CharacterController Body;
@@ -34,6 +53,10 @@ public class CharacterMovement : MonoBehaviour
         Body = GetComponent<CharacterController>();
     }
     //Coords lol2;
+    void Start()
+    {
+        Instance = this;
+    }
 
     // Update is called once per frame  
     void FixedUpdate()
@@ -47,24 +70,56 @@ public class CharacterMovement : MonoBehaviour
         var MovementVec = moveToTarget(targetVec);
         //rotate direction traveling
 
-        rotatetoMovementVector(MovementVec);
 
+        if (Input.GetMouseButton(1))
+            rotatetoMovementVector(MovementVec);
+
+
+
+      
         Vector3 CamPos = Cam.transform.position;
 
         CamPos.x = transform.position.x - t;
-        CamPos.y = transform.position.y + 120;
-        CamPos.z = transform.position.z - 90;
+        CamPos.y = transform.position.y + 100;
+        CamPos.z = transform.position.z - 80;
 
-       // lol2 = new Coords(1,2);
-       // lol3 = new Coords(1, 3);
+        if (Input.GetKeyDown("right"))
+        {
+            follow = !follow;
+            
+        }
+        if (follow == true)
+        {
+            CamPos.x = Selected.transform.position.x - t;
+            CamPos.y = Selected.transform.position.y + 100;
+            CamPos.z = Selected.transform.position.z - 80;
+        }
+
+        // lol2 = new Coords(1,2);
+        // lol3 = new Coords(1, 3);
         if (Input.GetMouseButton(0))
         {
-            Vector3 dir = Cam.ScreenToViewportPoint(Input.mousePosition);
-            
-              //Debug.Log(dir);
-                
-                   
+            Ray ray = Cam.ScreenPointToRay(_input.MousePos);
+            if (Physics.Raycast(ray, out RaycastHit hitinfo, maxDistance: 750f))
+            {
+                var target = hitinfo.point;
+                target.y = transform.position.y;
+                GameObject Selector = Instantiate(test,target,Quaternion.identity);
+                Selected = EntityTracker.Instance.SelectClosestEntity(Selector.transform.position);
+                Debug.Log(Selector.transform.position);
+                Destroy(Selector);
+            }       
         }
+
+
+
+
+
+
+
+
+
+
 
         Cam.transform.position = CamPos;
     }
@@ -78,14 +133,15 @@ public class CharacterMovement : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, rotateSpeed);
         */
 
-        Ray ray = Cam.ScreenPointToRay(_input.MousePos);
 
+        Ray ray = Cam.ScreenPointToRay(_input.MousePos);
         if (Physics.Raycast(ray, out RaycastHit hitinfo, maxDistance: 500f))
         {
             var target = hitinfo.point;
             target.y = transform.position.y;
-            transform.LookAt(target);
+            transform.position = target;
         }
+
 
     }
 
@@ -100,7 +156,7 @@ public class CharacterMovement : MonoBehaviour
         // transform.position = targetPos;
         //Body.transform.position = targetPos;
         // Body.MovePosition(targetPos);
-        targetVec.y -= 5;
+        //targetVec.y -= 5;
         Body.Move(targetVec);
         //Body.AddForce(targetPos);
         return targetVec;

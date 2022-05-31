@@ -338,6 +338,13 @@ public class Map_Generation : MonoBehaviour
             
             
         }
+
+
+        if (Input.GetKeyDown("left"))
+        {
+
+            EntityTracker.Instance.DebugPring();
+        }
     }
 
         //changed to flatten the map

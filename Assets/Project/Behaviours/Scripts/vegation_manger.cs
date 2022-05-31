@@ -23,6 +23,9 @@ public class vegation_manger : MonoBehaviour
     public List<Vegetion> BearDiet; //berries, grain, fish mammals
     public List<Vegetion> GoirralDiet;
     public List<Vegetion> FrogDiet;
+    public List<Color> Vegcolors;
+
+    
     int width =200;
     int height  =200;
     //Dictaronrys for vegtbales
@@ -82,15 +85,12 @@ public class vegation_manger : MonoBehaviour
 
         //for spread seed
         VegetionBySeason = new Dictionary<Season, List<Vegetion>>();
-        VegetionBySeason.Add(Season.Summer, new List<Vegetion>());
-        VegetionBySeason.Add(Season.fall, new List<Vegetion>());
-        VegetionBySeason.Add(Season.autum, new List<Vegetion>());
-        VegetionBySeason.Add(Season.winter, new List<Vegetion>());
+        VegetionBySeason.Add(Season.Summer, Summer);
+        VegetionBySeason.Add(Season.fall, Fall);
+        VegetionBySeason.Add(Season.autum, Augest);
+        VegetionBySeason.Add(Season.winter, Winter);
 
-        VegetionBySeason[Season.Summer] = Summer;
-        VegetionBySeason[Season.fall] = Fall;
-        VegetionBySeason[Season.autum] = Augest;
-        VegetionBySeason[Season.winter] = Winter;
+
 
 
 
@@ -137,7 +137,7 @@ public class vegation_manger : MonoBehaviour
 
 
         //Create initial vegtables
-        NewSeasonVegtables(currentSeason, 6);
+        NewSeasonVegtables(currentSeason, 10);
 
 
     }
@@ -324,6 +324,8 @@ public class vegation_manger : MonoBehaviour
                             Locations.Add(NewVeg.xy);
                             TemporyAmount++;
                             NewVeg.transform.SetParent(Vegtables.transform);
+                            NewVeg.GetComponentInChildren<Renderer>().material.color = Vegcolors[((int)type)];
+
                             break;
 
                         }

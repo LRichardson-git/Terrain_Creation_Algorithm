@@ -19,11 +19,11 @@ public class Alive_entity : MonoBehaviour
 
     //Status
     public int food = 10;
-    protected bool dead = false;
+    public bool dead = false;
     public int HP = 10;
     public bool isfemale;
     public float MatingUrge;
-    public float matingThresholf = 0.4f;
+    public float matingTHreshold = 0.45f;
     public bool pregnant;
     public bool partner;
     public Alive_entity Mate;
@@ -45,15 +45,14 @@ public class Alive_entity : MonoBehaviour
         if (cause == Death.decompose || food <= 0)
         {
            // Debug.Log("destory");
-            Debug.Log(cause);
             EntityTracker.Instance.RemoveEntity(Specie, this);
             Destroy(gameObject);
             
         }
 
         dead = true;
-        Reason = cause;  
-        
+        Reason = cause;
+        EntityTracker.Instance.UpdateDeath(cause);
     
     
     }
@@ -69,7 +68,7 @@ public class Alive_entity : MonoBehaviour
 
     public bool requestMating(float desirebil)
     {
-        if (desirebil * MatingUrge > matingThresholf && partner == false)
+        if (desirebil * MatingUrge > matingTHreshold && partner == false && dead != true)
         {
             partner = true;
             CurrentAction = Actions.GoingToMate;

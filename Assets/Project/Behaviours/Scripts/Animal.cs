@@ -9,18 +9,19 @@ public class Animal : Alive_entity
     //General
     float LastActionTime;
     float TimeBetweenACtions = 2;
-    float tired;
+    public float tired;
      float maxMatingTime = 150;
-    float maxTiredTime = 250;
-    
+    float maxTiredTime = 300;
+    public float minusPosY = 0;
     //speeds
     float drinkSpeed = 7;
     float eatSpeed = 11;
     public float movespeed = 20;
-    public float waterTrheshhold = 0.5f;
-    public float HungerTHreshold = 0.4f;
-    public float matingTHreshold = 0.8f;
+    public float waterTrheshhold = 0.4f;
+    public float HungerTHreshold = 0.3f;
+    
     public float tiredTHreshold = 0.55f;
+    int dangerrange = 5;
     //Genes
     public bool herbivore = true;
     public int range;
@@ -30,8 +31,11 @@ public class Animal : Alive_entity
     bool colorChange;
     public int gestationIndex;
     Color BabyColor;
+    Coords FoodArea;
 
-    public int matingrange = 5;
+    public int matingrange = 10;
+    public int waterRange = 10;
+    public int FoodRange = 10;
     int breedingtime;
      //speed. colour. range. reproduction urge. desribilty. gestation period. is female. hunger. thirst
     int[] BabiesGenes;
@@ -49,7 +53,7 @@ public class Animal : Alive_entity
     //Death
     float MaxHunger = 150;
     float MaxThirst = 190;
-    float TimetoDecompose = 90;
+    float TimetoDecompose = 35;
         //Other Entities
     Alive_entity Predator;
     public Alive_entity eating;
@@ -82,7 +86,7 @@ public class Animal : Alive_entity
         Coordinate = Position;
         x = Coordinate.x;
         y = Coordinate.y;
-
+        
         BabiesGenes = new int[10];
 
         
@@ -127,6 +131,20 @@ public class Animal : Alive_entity
 
       
         gestationIndex = gestationperiod;
+
+        Vector3 Temp = transform.position;
+        Temp.y -= minusPosY;
+        transform.position = Temp;
+
+        FoodRange += 5;
+        waterRange += 5;
+        speed += 2;
+        if (herbivore)
+        {
+            matingTHreshold -= 0.15f;
+            gestationperiod -= 2;
+        }
+
 }
 
 
@@ -202,7 +220,10 @@ public class Animal : Alive_entity
     {
         //IF TIRED == 1 INSTANTLY REST
 
-        if (tired > 0.98)
+        
+
+
+        if (tired > 0.95)
         {
             CurrentAction = Actions.Resting;
             return;
@@ -221,7 +242,10 @@ public class Animal : Alive_entity
         else if (Mate != null && CurrentAction != Actions.mating)
         {
             CurrentAction = Actions.GoingToMate;
+            return;
         }
+
+        
 
        
         
@@ -230,9 +254,9 @@ public class Animal : Alive_entity
             return;      
         }
 
+       
 
-
-        if (CurrentAction == Actions.chasing && EntityTracker.Instance.GetDistantance(x, y, eating.x, eating.y) <= range)
+        if (CurrentAction == Actions.chasing && EntityTracker.Instance.GetDistantance(x, y, eating.x, eating.y) <= range + FoodRange)
             return;
 
 
@@ -260,14 +284,21 @@ public class Animal : Alive_entity
 
         if (Hunger >= HungerTHreshold)
         {
-            
+
             if (herbivore)
+            {
                 if (foodHerbivore())
                     return;
-                else if (foodMeat() || foodHerbivore())
-                    return;
+            }
 
-            
+
+            else if (foodMeat())
+                return;
+            else if (foodHerbivore())
+                return;
+
+
+               
 
         }
 
@@ -288,14 +319,23 @@ public class Animal : Alive_entity
            }
 
 
-        CurrentAction = Actions.Exploring;
+
+        if (Random.Range(0, 6) >= 2)
+            CurrentAction = Actions.Exploring;
+        else
+            CurrentAction = Actions.Resting;
 
 
-       
-       
+
+
+
 
 
     }
+
+
+  
+
 
 
     public void goToRandomDirection()
@@ -304,9 +344,27 @@ public class Animal : Alive_entity
         if (PathList == null)
         {
 
+
+
             int lol = Random.Range(1, 5);
             int rInt = Random.Range(1, speed + 1);
             int rYnt = Random.Range(1, speed + 1);
+
+            if (FoodArea != null)
+            {
+                if ((rInt + rYnt) > (FoodArea.x + FoodArea.y + 25))
+                {
+                    rInt -= speed + 2;
+                    rYnt -= speed + 2;
+
+                }
+                else if ((rInt + rYnt) < (FoodArea.x + FoodArea.y - 25))
+                {
+                    rInt += speed - 2;
+                    rYnt += speed - 2;
+
+                }
+            }
 
             //OPTIMIZE THIS LATER BY CREATING NEW PATHLIST CREATOR FOR MOVING SLIGHTLY
 
@@ -329,9 +387,9 @@ public class Animal : Alive_entity
                     SetTargetLocation(x + rInt, y + rYnt);
                     break;
             }
-            
 
             
+
             /*
             if (Random.Range(1, 2) == 2 && x +rInt !> 199 && y + rYnt)
             {
@@ -349,7 +407,7 @@ public class Animal : Alive_entity
 
     bool findwater()
     {
-        WaterAdj = EntityTracker.Instance.FindWater(x, y, range);
+        WaterAdj = EntityTracker.Instance.FindWater(x, y, range + waterRange);
         if (WaterAdj.x != -1)
         {
             CurrentAction = Actions.GoingToWater;
@@ -360,9 +418,10 @@ public class Animal : Alive_entity
 
     private bool FindVegtable()
     {
-        Vegtable_target = vegation_manger.Instance.FindVegatble(x, y, range, Specie);
+        Vegtable_target = vegation_manger.Instance.FindVegatble(x, y, range + FoodRange, Specie);
         if (Vegtable_target.xy.x != -1)
         {
+            FoodArea = new Coords(Vegtable_target.xy.x, Vegtable_target.xy.y);
             CurrentAction = Actions.Goingtofood;
             return true;
         }
@@ -415,7 +474,7 @@ public class Animal : Alive_entity
     
     bool findMeat()
     {
-        eating = EntityTracker.Instance.CheckPray(x, y, range, Specie);
+        eating = EntityTracker.Instance.CheckPray(x, y, range + FoodRange, Specie);
         if (eating != null)
         {
             CurrentAction = Actions.chasing;
@@ -435,6 +494,7 @@ public class Animal : Alive_entity
         {
             case Actions.Exploring:
                 goToRandomDirection();
+               
                 break;
 
             case Actions.Goingtofood:
@@ -452,10 +512,10 @@ public class Animal : Alive_entity
             case Actions.escaping:
                 
                 SetTargetLocation(Tarx, tary);
+
+                if (PathList == null)
+                    goToRandomDirection();
                 break;
-
-            case Actions.chasing:
-
 
             case Actions.GoingToMate:
                 if (Mate != null && isfemale == false)
@@ -475,7 +535,7 @@ public class Animal : Alive_entity
                 {
                     pregnant = true;
                     BabiesGenes = EntityTracker.Instance.breed(geneValues, Mate.geneValues);
-                    BabyColor = EntityTracker.Instance.Newcolour(GetComponent<Renderer>().material.color, Mate.GetComponent<Renderer>().material.color);
+                    BabyColor = EntityTracker.Instance.Newcolour(GetComponentInChildren<Renderer>().material.color, Mate.GetComponentInChildren<Renderer>().material.color);
                     Mate = null;
                     MatingUrge = 0;
                 }
@@ -525,7 +585,7 @@ public class Animal : Alive_entity
         
             // AnimialNum = 4;
 
-            Predator = EntityTracker.Instance.CheckPredators(x, y, range, Specie);
+            Predator = EntityTracker.Instance.CheckPredators(x, y, dangerrange, Specie);
             if (Predator != null)
             {
             //run away
@@ -570,6 +630,7 @@ public class Animal : Alive_entity
             Die(Death.Thirst);
         }
 
+        
 
 
 
@@ -609,13 +670,21 @@ public class Animal : Alive_entity
             }
         }
     
-    
+     if (CurrentAction == Actions.Resting)
+        {
+            if (tired > 0)
+            {
+                tired -= Time.deltaTime * 1 / 5;
+                tired = Mathf.Clamp01(Hunger);
+            }
+
+        }
 
 
 
 
 
-    if (CurrentAction == Actions.chasing) // maybe just put this in going to food???
+            if (CurrentAction == Actions.chasing) // maybe just put this in going to food???
         {
             
             if (EntityTracker.Instance.GetDistantance(x, y, eating.x, eating.y) < 1.5) {
@@ -717,8 +786,9 @@ public class Animal : Alive_entity
                 pathindex = 0;
                 return;
             }
-
+            
             targetposition = PathList[pathindex];
+            
             if (PathList.Count > 1)
             {
 
@@ -739,7 +809,7 @@ public class Animal : Alive_entity
             Coordinate.x = x;
             Coordinate.y = y;
             CurrentPos = x + y;
-
+            //targetposition.y -= minusPosY;
             if (previousPos != CurrentPos)
             {
 

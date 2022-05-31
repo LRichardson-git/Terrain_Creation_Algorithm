@@ -15,7 +15,8 @@ public class EntityTracker : MonoBehaviour
     public int height;
     Color[] Colour_Map;
     List<Coords> GroupCentre;
-
+    int Deaths;
+    public List<int> DeathNumbers;
     //debuuggin
     public GameObject Animals;
 
@@ -25,6 +26,7 @@ public class EntityTracker : MonoBehaviour
     private const int m_Move_Diagonal_cost = 14;
     private int Debugg;
     public Coords[,] MapIndex;
+    public List<Death> REASONS;
 
     //water
     List<Coords> WaterTiles;
@@ -44,14 +46,14 @@ public class EntityTracker : MonoBehaviour
     public Dictionary<Species, List<Alive_entity>> SpeciesMap;
     public Dictionary<Species, List<Species>> PreySpecies;
     public Dictionary<Species, List<Species>> PredatorSpecies;
-    
+
 
     //Prefabs
     public List<Animal> Alive_Entities_Prefabs;
-     List<Species> SpeciesTypeList;
+    List<Species> SpeciesTypeList;
     Vector3 TempLoc;
 
-    
+
 
 
 
@@ -61,13 +63,13 @@ public class EntityTracker : MonoBehaviour
     }
 
 
-    public void RemoveEntity(Species speciy,  Alive_entity Entity )
+    public void RemoveEntity(Species speciy, Alive_entity Entity)
     {
         SpeciesMap[speciy].Remove(Entity);
 
     }
 
-    
+
 
     public float GetDistantance(int ax, int ay, int bx, int by)
     {
@@ -84,36 +86,53 @@ public class EntityTracker : MonoBehaviour
         // Debug.Log(Specis);
 
         float maxdist = Range;
-        
+
         List<Species> PredatorSpeciesList = PredatorSpecies[Specis];
 
         for (int i = 0; i < PredatorSpeciesList.Count; i++)
         {
 
-            
+
             List<Alive_entity> PredSpecieL = SpeciesMap[PredatorSpeciesList[i]];
 
             for (int j = 0; j < PredSpecieL.Count; j++)
             {
-                
+
                 float distant = GetDistantance(x, y, PredSpecieL[j].x, PredSpecieL[j].y);
 
 
                 //add check for if prey to another predator
-                if (distant < maxdist )
+                if (distant < maxdist && PredSpecieL[j].dead == false)
                 {
-                    Predat =  PredSpecieL[j];
+                    Predat = PredSpecieL[j];
                     maxdist = distant;
                 }
             }
         }
-        
+
 
         return Predat;
 
 
     }
 
+    public void UpdateDeath(Death Reason){
+        Deaths++;
+        DeathNumbers[((int)Reason)]++;
+        }
+
+    public void DebugPring()
+    {
+        Debug.Log(Deaths);
+        for (int i = 0; i < DeathNumbers.Count; i++)
+        {
+            Debug.Log(REASONS[i]);
+            Debug.Log(DeathNumbers[i]);
+
+        }
+
+        
+    }
 
     public Alive_entity CheckPray(int x, int y, int Range, Species Specis)
     {
@@ -125,18 +144,18 @@ public class EntityTracker : MonoBehaviour
         float maxdist = Range;
 
         List<Species> PreyspecisList = PreySpecies[Specis];
+
+  
         
         for (int i = 0; i < PreyspecisList.Count; i++)
         {
-
 
             List<Alive_entity> PredSpecieL = SpeciesMap[PreyspecisList[i]];
             for (int j = 0; j < PredSpecieL.Count; j++)
             {
 
                 float distant = GetDistantance(x, y, PredSpecieL[j].x, PredSpecieL[j].y);
-
-
+          
                 //add check for if prey to another predator
                 if (distant < maxdist)
                 {
@@ -159,7 +178,7 @@ public class EntityTracker : MonoBehaviour
         WaterTiles = new List<Coords>();
         WaterTilesAdjacent = new List<Coords>();
         Coords watertile;
-        Coords AdjancetTile;
+        
         Colour_Map = Map_Colour;
         GroupCentre = new List<Coords>();
 
@@ -190,8 +209,8 @@ public class EntityTracker : MonoBehaviour
                 if (Map_Colour[x * 200 + y] == Biome2)
                 {
 
-                    Debug.Log(x);
-                    Debug.Log(y);
+                    //Debug.Log(x);
+                   // Debug.Log(y);
                     MapIndex[x, y].IsWalkable = false;
                     watertile = new Coords(x, y);
                     WaterTiles.Add(watertile);
@@ -200,7 +219,8 @@ public class EntityTracker : MonoBehaviour
                     
                         if (Map_Colour[x + 1 * 200 + y] != Biome2)
                         {
-                        AdjancetTile = new Coords(x + 1, y);
+                             
+                            Coords AdjancetTile = new Coords(x + 1, y);
                         WaterTilesAdjacent.Add(AdjancetTile);
                         }
                        // Debug.Log(x - 1 * 200 + y);
@@ -208,20 +228,20 @@ public class EntityTracker : MonoBehaviour
                         //Debug.Log((x - 1) * 200 + y);
                         if (Map_Colour[(x - 1) * 200 + y] != Biome2)
                         {
-                        AdjancetTile = new Coords(x - 1, y);
+                            Coords AdjancetTile = new Coords(x - 1, y);
                         WaterTilesAdjacent.Add(AdjancetTile);
 
                     }
                         if (Map_Colour[x  * 200 + y + 1] != Biome2)
                         {
-                        AdjancetTile = new Coords(x, y + 1);
+                            Coords AdjancetTile = new Coords(x, y + 1);
                         WaterTilesAdjacent.Add(AdjancetTile);
 
                     }
 
                         if (Map_Colour[x * 200 + y - 1] != Biome2)
                         {
-                        AdjancetTile = new Coords(x, y-1);
+                            Coords AdjancetTile = new Coords(x, y-1);
                         WaterTilesAdjacent.Add(AdjancetTile);
 
                     }
@@ -229,24 +249,24 @@ public class EntityTracker : MonoBehaviour
                     if (Map_Colour[x + 1 * 200 + y + 1] != Biome2)
                     {
 
-                        AdjancetTile = new Coords(x + 1, y + 1);
+                            Coords AdjancetTile = new Coords(x + 1, y + 1);
                         WaterTilesAdjacent.Add(AdjancetTile);
                     }
                     if (Map_Colour[(x - 1) * 200 + y - 1] != Biome2)
                     {
 
-                        AdjancetTile = new Coords(x - 1, y - 1);
+                            Coords AdjancetTile = new Coords(x - 1, y - 1);
                         WaterTilesAdjacent.Add(AdjancetTile);
                     }
                     if (Map_Colour[(x - 1) * 200 + y + 1] != Biome2)
                     {
-                        AdjancetTile = new Coords(x - 1, y + 1);
+                            Coords AdjancetTile = new Coords(x - 1, y + 1);
                         WaterTilesAdjacent.Add(AdjancetTile);
 
                     }
                     if (Map_Colour[x + 1 * 200 + y - 1] != Biome2)
                     {
-                        AdjancetTile = new Coords(x + 1, y - 1);
+                            Coords AdjancetTile = new Coords(x + 1, y - 1);
                         WaterTilesAdjacent.Add(AdjancetTile);
 
 
@@ -313,7 +333,12 @@ public class EntityTracker : MonoBehaviour
 
      
         SpawnInitalAnimals(10, Biome2, 20);
+
+
         Debug.Log("inition done");
+
+
+        
       
     }
 
@@ -697,7 +722,12 @@ public class EntityTracker : MonoBehaviour
             return null;
 
         if (MapIndex[xEnd, yEnd].IsWalkable == false)
+        {
+            
+
             return null;
+        }
+            
 
 
         Coords StarCoord = MapIndex[xSt, ySt];
@@ -708,7 +738,7 @@ public class EntityTracker : MonoBehaviour
 
         List<Coords> ClosedList = new List<Coords>();
 
-        int check = 0;
+      
 
 
 
@@ -795,11 +825,42 @@ public class EntityTracker : MonoBehaviour
         Debug.Log(xEnd);
         Debug.Log(yEnd);
         Debug.Log(MapIndex[xEnd, yEnd].IsWalkable);
+        MapIndex[xEnd, yEnd].IsWalkable = false;
+
 
         Debug.Log("null");
         return null;
 
     }
+
+    public Alive_entity SelectClosestEntity(Vector3 Position)
+    {
+        Vector2 lol = GetGrid(Position);
+        Debug.Log(lol.x);
+        Debug.Log(lol.y);
+        for (int i = 0; i < IncludedSpecies.Count; i++)
+        {
+            for (int j = 0; j < SpeciesMap[IncludedSpecies[i]].Count; j++)
+            {
+                if (GetDistantance((int)lol.x, (int)lol.y, SpeciesMap[IncludedSpecies[i]][j].x, SpeciesMap[IncludedSpecies[i]][j].y) < 1.5)
+                {
+                    Debug.Log(lol.x);
+                    Debug.Log(lol.y);
+                    return SpeciesMap[IncludedSpecies[i]][j];
+                }
+
+            }
+
+
+        }
+
+
+        return null;
+
+    }
+
+
+
 
     public Vector3 Coordtoworld(Coords Transcoord)
     {

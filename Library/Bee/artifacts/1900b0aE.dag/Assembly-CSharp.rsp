@@ -339,12 +339,11 @@
 "Assets/Project/Enviroment/Scripts/Erosion.cs"
 "Assets/Project/Enviroment/Scripts/MapMeshGenertion.cs"
 "Assets/Project/Enviroment/Scripts/Map_Generation.cs"
-"Assets/Project/Enviroment/Scripts/Mouselook.cs"
-"Assets/Project/Enviroment/Scripts/movement.cs"
 "Assets/Project/Enviroment/Scripts/Noise_Maps.cs"
 "Assets/Project/Enviroment/Scripts/Textures.cs"
 "Assets/Project/Player/CharacterMovement.cs"
 "Assets/Project/Player/Inputs_handle.cs"
+"Assets/Project/Player/SelectorScript.cs"
 -langversion:8.0
 
 /deterministic
