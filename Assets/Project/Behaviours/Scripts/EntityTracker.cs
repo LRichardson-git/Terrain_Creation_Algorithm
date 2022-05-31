@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 //envir
 public class EntityTracker : MonoBehaviour
@@ -20,6 +20,9 @@ public class EntityTracker : MonoBehaviour
     //debuuggin
     public GameObject Animals;
 
+    public Text DeathText;
+    public Text Births;
+    
     //Pathfinding
     public static bool[,] walkable;
     private const int m_Move_Straight_Cost = 10;
@@ -27,7 +30,10 @@ public class EntityTracker : MonoBehaviour
     private int Debugg;
     public Coords[,] MapIndex;
     public List<Death> REASONS;
+    int births;
 
+
+    
     //water
     List<Coords> WaterTiles;
     List<Coords> WaterTilesAdjacent;
@@ -62,6 +68,11 @@ public class EntityTracker : MonoBehaviour
         Instance = this;
     }
 
+    private void Update()
+    {
+        DeathText.text = "Deaths: " + Deaths;
+        Births.text = "Births: " + births;
+     }
 
     public void RemoveEntity(Species speciy, Alive_entity Entity)
     {
@@ -493,6 +504,7 @@ public class EntityTracker : MonoBehaviour
 
         //may change index since not accounts for spawn home
         spawnAnimalAt(spawn, Genes, species, 0, ChildColour,false);
+        births++;
 
     }
 

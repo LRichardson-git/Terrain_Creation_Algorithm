@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class vegation_manger : MonoBehaviour
 {
 
@@ -25,7 +25,7 @@ public class vegation_manger : MonoBehaviour
     public List<Vegetion> FrogDiet;
     public List<Color> Vegcolors;
 
-    
+    public Text VegtablesT;
     int width =200;
     int height  =200;
     //Dictaronrys for vegtbales
@@ -146,6 +146,7 @@ public class vegation_manger : MonoBehaviour
     void Update()
     {
 
+        VegtablesT.text = "Vegtables: " + Locations.Count;
 
 
         float TimeSinceLastAction = Time.time - LastWeek;
