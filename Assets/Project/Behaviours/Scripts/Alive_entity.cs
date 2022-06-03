@@ -18,9 +18,7 @@ public class Alive_entity : MonoBehaviour
     public Species Specie;
 
     //Status
-    public int food = 10;
     public bool dead = false;
-    public int HP = 10;
     public bool isfemale;
     public float MatingUrge;
     public float matingTHreshold = 0.45f;
@@ -42,7 +40,7 @@ public class Alive_entity : MonoBehaviour
             }
         }
 
-        if (cause == Death.decompose || food <= 0)
+        if (cause == Death.decompose)
         {
            // Debug.Log("destory");
             EntityTracker.Instance.RemoveEntity(Specie, this);

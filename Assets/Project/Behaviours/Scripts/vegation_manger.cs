@@ -32,7 +32,7 @@ public class vegation_manger : MonoBehaviour
     int height  =200;
     bool started;
     int VegtablesPerGroup;
-    int Groupss = 12;
+    int Groupss = 10;
     //Dictaronrys for vegtbales
     Dictionary<Species, List<Vegetion>> Eatablevegatblesbyspecies;
     Dictionary<Vegetion, List<Vegtable>> ListofVegtables;
@@ -64,7 +64,7 @@ public class vegation_manger : MonoBehaviour
     //Data for spawning vegtables, and real time updates
     public int SpawnAmount = 10;
     float LastWeek;
-    float TimeBetweenWeeks = 30;
+    float TimeBetweenWeeks = 360;
     float week = 0;
     List<Coords> GroupCentre;
     int Index = 0;
@@ -252,6 +252,7 @@ public class vegation_manger : MonoBehaviour
                     
                     }
                 break;
+
 
             case Season.fall:
 

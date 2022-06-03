@@ -1231,17 +1231,16 @@ MonoBehaviour:
   Reason: 0
   material: {fileID: 0}
   Specie: 0
-  food: 10
   dead: 0
-  HP: 10
   isfemale: 0
   MatingUrge: 0
-  matingTHreshold: 0.12
+  matingTHreshold: 0.2
   pregnant: 0
   partner: 0
   Mate: {fileID: 0}
   geneValues: 
   CurrentAction: 0
+  tired: 0
   minusPosY: 0
   movespeed: 20
   waterTrheshhold: 0.53
@@ -1251,7 +1250,7 @@ MonoBehaviour:
   range: 5
   gestationperiod: 3
   gestationIndex: 0
-  matingrange: 16
+  matingrange: 31
   waterRange: 13
   FoodRange: 12
   Tarx: 0

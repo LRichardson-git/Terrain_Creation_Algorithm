@@ -9,53 +9,58 @@ public class EntityTracker : MonoBehaviour
 
     public static EntityTracker Instance { get; private set; }
 
-    //general
+    //Data for world intionalizion
     public int seed;
     public int width;
     public int height;
     Color[] Colour_Map;
     List<Coords> GroupCentre;
+    bool started;
+
+    //Spawning animals
+    int births;
+    int AmountPerGroup = 20;
+    int Groups1 = 10;
+
+    //data to display on screen
     int Deaths;
     public List<int> DeathNumbers;
-    //debuuggin
-    public GameObject Animals;
+    public List<Death> REASONS;
+    public Text Spawning1;
+    public Text Spawning2;
+
 
     public Text DeathText;
     public Text Births;
-    bool started;
+
+    //debuuggin
+    public GameObject Animals;
+
+
     //Pathfinding
     public static bool[,] walkable;
     private const int m_Move_Straight_Cost = 10;
     private const int m_Move_Diagonal_cost = 14;
-    private int Debugg;
     public Coords[,] MapIndex;
-    public List<Death> REASONS;
-    int births;
-    int AmountPerGroup = 20;
-    int Groups1 = 10;
     
-    public Text Spawning1;
-    public Text Spawning2;
     
     //water
     List<Coords> WaterTiles;
     List<Coords> WaterTilesAdjacent;
 
-    //List of what things eat
-
+    //List of what things eat (carnivores
     public List<Species> FoxDietMeat;
     public List<Species> raccoonDietMeat;
     public List<Species> SquriellDietMeat;
-    public List<Species> LionDiet;//deer boar rhino raccon (if really hungry BEAR GOIRRLA)
+    public List<Species> LionDiet;
     public List<Species> BearDietmeat;
     public List<Species> IncludedSpecies;
     public List<Species> IncludedSpeciesnonmeat;
 
-    //storing lists o
+    //Dicaronies that contrain diets and predators depending on species inputted
     public Dictionary<Species, List<Alive_entity>> SpeciesMap;
     public Dictionary<Species, List<Species>> PreySpecies;
     public Dictionary<Species, List<Species>> PredatorSpecies;
-
 
     //Prefabs
     public List<Animal> Alive_Entities_Prefabs;
@@ -265,15 +270,14 @@ public class EntityTracker : MonoBehaviour
 
                     if (x > 0 && x < 200 && y > 0 && y < 200) { 
                     
+
                         if (Map_Colour[x + 1 * 200 + y] != Biome2)
                         {
                              
                             Coords AdjancetTile = new Coords(x + 1, y);
                         WaterTilesAdjacent.Add(AdjancetTile);
                         }
-                       // Debug.Log(x - 1 * 200 + y);
-                       // Debug.Log( y);
-                        //Debug.Log((x - 1) * 200 + y);
+                       
                         if (Map_Colour[(x - 1) * 200 + y] != Biome2)
                         {
                             Coords AdjancetTile = new Coords(x - 1, y);
@@ -328,7 +332,7 @@ public class EntityTracker : MonoBehaviour
         }
 
 
-
+        Debug.Log(WaterTilesAdjacent.Count);
         //create dictionarys for tracking entitiers and getting species
     
         SpeciesMap = new Dictionary<Species, List<Alive_entity>>();
@@ -499,17 +503,15 @@ public class EntityTracker : MonoBehaviour
 
     public void spawnAnimalAt(Coords Spawn, int[] GeneValues, int specie, int index, Color MatColor, bool Initial)
     {
-       // Spawn.x = 30;
-     //   Spawn.y = Debugg;
-        TempLoc = EntityTracker.Instance.Coordtoworld(Spawn);
+
+        TempLoc = Coordtoworld(Spawn);
         Animal NewEntity = Instantiate(Alive_Entities_Prefabs[specie], TempLoc, Alive_Entities_Prefabs[specie].transform.rotation );
         NewEntity.init(GeneValues, Spawn, GroupCentre[index],MatColor, Initial);
 
         SpeciesMap[(SpeciesTypeList[specie])].Add(NewEntity);
         NewEntity.transform.SetParent(Animals.transform);
         NewEntity.transform.position = TempLoc;
-        //  Debugg -= 10;
-        //add to dictariony and location list
+
 
 
     }
@@ -519,14 +521,14 @@ public class EntityTracker : MonoBehaviour
 
     public void Spawnchild(int[]Genes, int gestation, Coords spawn, int species, Color ChildColour)
     {
-        //Debug.Log(species);
-
-        //genes
+        //Debuf on genes depending on how long was pregnent
         int debuff = -15;
         Genes[3] += debuff + (gestation * 2);
         Genes[4] += debuff + gestation;
         Genes[7] += debuff + gestation;
-            
+           
+
+        //makes genes not go over limit
         for (int i = 3; i < 8; i++)
         {
             if (Genes[i] > 255)
@@ -537,9 +539,7 @@ public class EntityTracker : MonoBehaviour
         }
 
         
-
-
-        //may change index since not accounts for spawn home
+        //spawn child
         spawnAnimalAt(spawn, Genes, species, 0, ChildColour,false);
         births++;
 
@@ -555,16 +555,16 @@ public class EntityTracker : MonoBehaviour
 
     public int[] breed(int[] GenesFemale, int[] GenesMale)
     {
-        int[] NewGenes = new int[10];
+        int[] NewGenes = new int[10]; //new genes
 
-        for (int i = 0; i < NewGenes.Length; i++)
+        for (int i = 0; i < NewGenes.Length; i++) // Random genes from parents given to child
         {
             int chance = Random.Range(1, 3);
 
             if (chance == 1)
                 NewGenes[i] = GenesMale[i];
             else
-                NewGenes[i] = GenesFemale[i];
+                NewGenes[i] = GenesFemale[i]; //50/50 chance
 
 
 
@@ -573,26 +573,26 @@ public class EntityTracker : MonoBehaviour
         NewGenes[1] = Random.Range(1, 255);
         NewGenes[5] = GenesFemale[5];
 
-        //might need to chance
+        //give mother genes of child
         return NewGenes;
     }
 
     public Alive_entity FindMate(Species Specie, int range, Coords Position, int desirebile)
     {
 
-        for (int i = 0; i < SpeciesMap[Specie].Count; i++)
+        for (int i = 0; i < SpeciesMap[Specie].Count; i++) //loop through species
         {
 
             float Length = GetDistantance(Position.x, Position.y, SpeciesMap[Specie][i].x, SpeciesMap[Specie][i].y);
 
-            if (Length < range && SpeciesMap[Specie][i].isfemale == true)
+            if (Length < range && SpeciesMap[Specie][i].isfemale == true) // If in range ask to mate
             {
-                if (SpeciesMap[Specie][i].requestMating(desirebile)) ;
+                if (SpeciesMap[Specie][i].requestMating(desirebile)) // if accepts mating request return Alive_entity
                     return SpeciesMap[Specie][i];
             }
         }
 
-        return null;
+        return null; //no one to mate with
 
     }
 
@@ -627,39 +627,18 @@ public class EntityTracker : MonoBehaviour
 
 
 
-    //Find nearest Water source
-    public Coords closestWater(int x, int y)
-    {
-        Coords Tile = new Coords(-1, -1);
-        float Dist = 2;
 
 
 
-        for (int i = 0; i < WaterTilesAdjacent.Count; i++)
-        {
-            float Length = GetDistantance(x, y, WaterTiles[i].x, WaterTiles[i].y);
 
-            if (Length < Dist)
-            {
-                Dist = Length;
-                Tile.x = WaterTiles[i].x;
-                Tile.y = WaterTiles[i].y;
-            }
-        }
-
-        return Tile;
-
-    }
-
-
-    public Coords FindWater(int x, int y, int range)
+    public Coords FindWater(int x, int y, int range)     //Find nearest Water source
     {
         Coords Tile = new Coords(-1, -1);
         float Dist = range;
 
 
 
-        for (int i = 0; i < WaterTilesAdjacent.Count; i++)
+        for (int i = 0; i < WaterTilesAdjacent.Count; i++)//loop through tiles that are adjancet to water
         {
             float Length = GetDistantance(x, y, WaterTilesAdjacent[i].x, WaterTilesAdjacent[i].y);
 
@@ -671,84 +650,9 @@ public class EntityTracker : MonoBehaviour
             }
         }
 
-        return Tile;
+        return Tile;// return closest tile, if no tile in range it returns -1,-1;
 
     }
-    public Coords FindWaterAgain(int x, int y, int range, List<Coords> Unuseable)
-    {
-        Coords Tile = new Coords(-1, -1);
-        float Dist = range;
-
-
-
-        for (int i = 0; i < WaterTilesAdjacent.Count; i++)
-        {
-            float Length = GetDistantance(x, y, WaterTilesAdjacent[i].x, WaterTilesAdjacent[i].y);
-
-            if (Length < range)
-            {
-                for (int j = 0; j < Unuseable.Count; j++)
-                {
-                    if (WaterTilesAdjacent[i].x != Unuseable[j].x && WaterTilesAdjacent[i].y != Unuseable[j].y)
-                    {
-                        Dist = Length;
-                        Tile.x = WaterTilesAdjacent[i].x;
-                        Tile.y = WaterTilesAdjacent[i].y;
-
-                    }
-
-                }
-
-            }
-        }
-
-        return Tile;
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     //PathFinding
@@ -882,7 +786,7 @@ public class EntityTracker : MonoBehaviour
 
     }
 
-    public Alive_entity SelectClosestEntity(Vector3 Position)
+    public Alive_entity SelectClosestEntity(Vector3 Position) // called by character
     {
         Vector2 lol = GetGrid(Position);
 
@@ -892,16 +796,11 @@ public class EntityTracker : MonoBehaviour
             {
                 if (GetDistantance((int)lol.x, (int)lol.y, SpeciesMap[IncludedSpecies[i]][j].x, SpeciesMap[IncludedSpecies[i]][j].y) < 1.5)
                 {
-
-
                     return SpeciesMap[IncludedSpecies[i]][j];
                 }
 
             }
-
-
         }
-
 
         return null;
 

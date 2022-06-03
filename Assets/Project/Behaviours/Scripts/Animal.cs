@@ -139,6 +139,7 @@ public class Animal : Alive_entity
         FoodRange += 5;
         waterRange += 5;
         speed += 2;
+        matingrange += 10;
         if (herbivore)
         {
             matingTHreshold -= 0.15f;
@@ -174,10 +175,7 @@ public class Animal : Alive_entity
 
             if (TimeSinceLastAction > TimeBetweenACtions)
         {
-               
-               // Debug.Log(TimeBetweenACtions);
                 
-
                 ChooseAction();
 
                 DoActions();
@@ -185,14 +183,14 @@ public class Animal : Alive_entity
 
                 LastActionTime = Time.time;
 
-                if (pregnant)
+                if (pregnant) //Females only
                 {
                     gestationIndex--;
 
                     if (gestationIndex <= 0)
                     {
                         EntityTracker.Instance.Spawnchild(BabiesGenes, gestationperiod, Coordinate, ((int)Specie), BabyColor);
-
+                        partner = false;
                         pregnant = false;
                         gestationIndex = gestationperiod;
                         MatingUrge = 0;
@@ -203,14 +201,7 @@ public class Animal : Alive_entity
 
         }
 
-
-        
-
         UpdateStatus();
-    
-
-
-
         FindPath();
         
         }
@@ -218,10 +209,6 @@ public class Animal : Alive_entity
 
     private void ChooseAction()
     {
-        //IF TIRED == 1 INSTANTLY REST
-
-        
-
 
         if (tired > 0.95)
         {
@@ -345,7 +332,6 @@ public class Animal : Alive_entity
         {
 
 
-
             int lol = Random.Range(1, 5);
             int rInt = Random.Range(1, speed + 1);
             int rYnt = Random.Range(1, speed + 1);
@@ -365,8 +351,6 @@ public class Animal : Alive_entity
 
                 }
             }
-
-            //OPTIMIZE THIS LATER BY CREATING NEW PATHLIST CREATOR FOR MOVING SLIGHTLY
 
             switch (lol)
             {
@@ -388,25 +372,17 @@ public class Animal : Alive_entity
                     break;
             }
 
-            
 
-            /*
-            if (Random.Range(1, 2) == 2 && x +rInt !> 199 && y + rYnt)
-            {
-                SetTargetLocation(x + rInt, y + rYnt);
-            }
-            else
-                SetTargetLocation(x - rInt, y - rYnt);
-            */
 
 
         }
-        //MIGHT HAVE TO LIMIT IT
+  
         
     }
 
     bool findwater()
     {
+        waterDrink = new Coords(-1,-1);
         WaterAdj = EntityTracker.Instance.FindWater(x, y, range + waterRange);
         if (WaterAdj.x != -1)
         {
@@ -426,12 +402,6 @@ public class Animal : Alive_entity
             return true;
         }
         
-        return false;
-    }
-
-    bool FindFood()
-    {
-
         return false;
     }
 
@@ -546,11 +516,10 @@ public class Animal : Alive_entity
                     MatingUrge = 0;
 
                 }
-                    
-            
-
                 break;
 
+
+                
 
         }
     }
@@ -640,7 +609,8 @@ public class Animal : Alive_entity
             {
                 Thirst -= Time.deltaTime * 1 / drinkSpeed;
                 Thirst = Mathf.Clamp01(Thirst);
-
+                WaterAdj = null;
+                
             }
             else
                 CurrentAction = Actions.Exploring;
@@ -734,14 +704,11 @@ public class Animal : Alive_entity
 
     public bool Move()
     {
-        //Will loop thorough the path list by removeing the pathnode the gameobject is on when you move
-        //Debug.Log("test");
-       
-           // movepoints--;
+
             pathindex = 0;
             PathList = new List<Vector3>();
             PathList = EntityTracker.Instance.FindPath(Tarx, tary, x,y);
-      //  Debug.Log(PathList[pathindex]);
+
 
             if (PathList != null && PathList.Count > 1)
             {
@@ -761,9 +728,9 @@ public class Animal : Alive_entity
             }
             return false;
 
+
+
         
-
-
 
     }
 
@@ -792,12 +759,8 @@ public class Animal : Alive_entity
             if (PathList.Count > 1)
             {
 
-                //var lookpos = targetposition - transform.position;
-               // var rotation = Quaternion.LookRotation(lookpos);
-                
-               //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime);
+
                 transform.LookAt(targetposition,transform.up);
-                  //transform.Rotate(transform.rotation.x, transform.rotation.y - 90, transform.rotation.z);
 
             }
             // Vector3 Temp = EntityTracker.Instance.GetGrid(newPos);

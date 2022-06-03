@@ -190,12 +190,6 @@ public class CharacterMovement : MonoBehaviour
     private void rotatetoMovementVector(Vector3 MovementVec)
     {
         //keep last rotation unless changed
-        /*
-        if(MovementVec.magnitude == 0) { return; }
-        var rotation = Quaternion.LookRotation(MovementVec);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, rotateSpeed);
-        */
-
 
         Ray ray = Cam.ScreenPointToRay(_input.MousePos);
         if (Physics.Raycast(ray, out RaycastHit hitinfo, maxDistance: 500f))
@@ -216,12 +210,8 @@ public class CharacterMovement : MonoBehaviour
         targetVec = Quaternion.Euler(0, Cam.gameObject.transform.eulerAngles.y, 0) * targetVec;
 
         var targetPos = transform.position + targetVec * moveSpeed;
-        // transform.position = targetPos;
-        //Body.transform.position = targetPos;
-        // Body.MovePosition(targetPos);
-        //targetVec.y -= 5;
+
         Body.Move(targetVec);
-        //Body.AddForce(targetPos);
         return targetVec;
     }
 }
